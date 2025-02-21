@@ -1,0 +1,55 @@
+/* reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  font-family: 'Roboto', 'Ubuntu', 'Arial', sans-serif;
+}
+
+#form {
+  width: 100%;
+  bottom: 0.5rem;
+  display: flex;
+  padding: 0.5rem;
+  gap: 0.5rem;
+}
+
+input#input {
+  width: 100%;
+  font-size: 1.5rem;
+  border-radius: 0.5rem;
+}
+
+#messages {
+  display: flex;
+  height: calc(100vh - 4rem);
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem;
+  overflow-y: scroll;
+  width: 100%;
+}
+
+#messages li {
+  list-style: none;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+}
+
+#messages li.sent{
+  background-color: #a5d3c9;
+  margin-left: 5rem;
+  border-bottom-right-radius: 0;
+}
+
+#messages li.received{
+  background-color: #b6bae5;
+  margin-right: 5rem;
+  border-bottom-left-radius: 0;
+}
