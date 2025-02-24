@@ -2,6 +2,7 @@ import express from 'express';
 import http from 'node:http';
 import { Server } from 'socket.io';
 import { Game } from './public/js/game.js';
+import { CommandHandler } from './src/commandHandler.js';
 
 const app = express();
 const server = http.createServer(app);
@@ -11,6 +12,7 @@ const io = new Server(server);
 app.use(express.static('public'));
 
 const game = new Game();
+const commandHandler = new CommandHandler(game, io);
 
 io.on('connection', (socket) => {
   const player = {
@@ -38,39 +40,12 @@ io.on('connection', (socket) => {
   });
 
   socket.on('startGame', () => {
-    if (game.state.isStarted) {
-      return;
-    }
-    console.log('----- GAME STARTED -----');
-    game.startGame();
-
-    for (const playerId of Object.keys(game.state.players)) {
-      const playerSocket = io.sockets.sockets.get(playerId);
-      if (!playerSocket) {
-        console.error(`Player ${playerId} not found`);
-        continue;
-      }
-      playerSocket.emit('gameStarted', {
-        cards: game.playerCards[playerId],
-      });
-    }
-    io.emit('updateGame', game.state);
-    const playerInTurn = game.state.playerInTurn;
-    const playersOrder = [playerInTurn];
-    game.nextTurn();
-    while (game.state.playerInTurn !== playerInTurn) {
-      playersOrder.push(game.state.playerInTurn);
-      game.nextTurn();
-    }
-    const playersOrderNames = playersOrder.map(
-      (playerId) => game.state.players[playerId].name
-    );
-
+    const playersOrderNames = commandHandler.startGame(io.sockets.sockets);
+    io.emit('updateGame', game.state); // Update game state for all players, since the game has started
     io.emit('messageReceived', {
       player: { name: 'JOGO' },
       message: `O jogo começou!<br/> A ordem dos jogadores é: ${playersOrderNames.join(' → ')}`,
     });
-
     io.emit('messageReceived', {
       player: { name: 'JOGO' },
       message: `É a vez de ${
@@ -80,8 +55,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('stopGame', () => {
-    console.log('----- GAME STOPPED -----');
-    game.stopGame();
+    commandHandler.stopGame();
     io.emit('updateGame', game.state);
   });
 
