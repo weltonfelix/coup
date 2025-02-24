@@ -19,34 +19,64 @@ const socket = io({
   },
 });
 
+function sendTextMessage(message) {
+  socket.emit('sendMessage', message);
+  messageRenderer.renderSentMessage(message);
+}
+
+function renderSecretMessage(message) {
+  messageRenderer.renderReceivedMessage({ name: 'JOGO (secreto)' }, message);
+}
+
+const commands = {
+  '/iniciar': () => {
+    socket.emit('startGame');
+  },
+  '/parar': () => {
+    socket.emit('stopGame');
+  },
+};
+
 socket.on('connect', () => {
   const myPlayerId = socket.id;
   let myCards = [];
 
+  const inGameActions = {
+    '/moedas': () => {
+      renderSecretMessage(
+        `Você tem ${game.state.players[myPlayerId].coins} moedas.`
+      );
+    },
+    '/cartas': () => {
+      renderSecretMessage(
+        `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}.`
+      );
+    },
+  };
+
   formElement.addEventListener('submit', (event) => {
     event.preventDefault();
     const message = inputElement.value;
-    if (game.state.isStarted) {
-      if (message === '/moedas') {
-        messageRenderer.renderReceivedMessage(
-          { name: 'JOGO (secreto)' },
-          `Você tem ${game.state.players[myPlayerId].coins} moedas`
-        );
-        return;
-      } else if (message === '/cartas') {
-        messageRenderer.renderReceivedMessage(
-          { name: 'JOGO (secreto)' },
-          `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}`
-        );
-        return;
+
+    // Check if the message is a game command
+    if (message.startsWith('/')) {
+      const gameAction = inGameActions[message];
+      if (gameAction) {
+        if (game.state.isStarted) {
+          gameAction();
+        } else {
+          // TODO: Informar que o jogo não está iniciado
+        }
+      } else {
+        const command = commands[message];
+        if (command) {
+          command();
+        } else {
+          sendTextMessage(message);
+        }
       }
-    }
-    socket.emit('sendMessage', message);
-    messageRenderer.renderSentMessage(message);
-    if (message === '/iniciar') {
-      socket.emit('startGame');
-    } else if (message === '/parar') {
-      socket.emit('stopGame');
+    } else {
+      sendTextMessage(message);
     }
     inputElement.value = '';
   });
