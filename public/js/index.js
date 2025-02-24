@@ -52,6 +52,12 @@ socket.on('connect', () => {
         `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}.`
       );
     },
+    '/renda': () => {
+      socket.emit('gameAction', {action:'income'});
+    },
+    '/ajudaexterna': () => {
+      socket.emit('gameAction', {action:'foreignAid'});
+    },
   };
 
   formElement.addEventListener('submit', (event) => {

@@ -5,12 +5,7 @@ export class CommandHandler {
   }
 
   startGame(sockets) {
-    if (this.game.state.isStarted) {
-      return; // Game already started
-    }
-    console.log('----- GAME STARTED -----');
     this.game.startGame();
-
     this.#distributeCards(sockets);
     
     const playerInTurn = this.game.state.playerInTurn;
@@ -18,7 +13,6 @@ export class CommandHandler {
   }
 
   stopGame() {
-    console.log('----- GAME STOPPED -----');
     this.game.stopGame();
   }
 
