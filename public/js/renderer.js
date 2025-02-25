@@ -17,7 +17,7 @@ export class Renderer {
       <strong>${player.name}</strong>
       <p>${message}</p>
     `;
-    this.containerEl.appendChild(el);
+    this.containerEl.prepend(el);
   }
 
   #createMessageEl(sent) {
