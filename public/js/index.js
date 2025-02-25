@@ -62,16 +62,29 @@ socket.on('connect', () => {
       );
     },
     '/renda': () => {
-      socket.emit('gameAction', {action:'income'});
+      socket.emit('gameAction', { action: 'income' });
     },
     '/ajudaexterna': () => {
-      socket.emit('gameAction', {action:'foreignAid'});
+      socket.emit('gameAction', { action: 'foreignAid' });
     },
     '/roubar': (target) => {
-      socket.emit('gameAction', {action:'steal', target});
+      socket.emit('gameAction', { action: 'steal', param: target });
     },
     '/imposto': () => {
-      socket.emit('gameAction', {action:'tax'});
+      socket.emit('gameAction', { action: 'tax' });
+    },
+    '/coup': (target) => {
+      socket.emit('gameAction', { action: 'coup', param: target });
+    },
+    '/coupdrop': (cardName) => {
+      if (!myCards.find((card) => card.name === cardName)) {
+        return renderSecretMessage('Você não tem essa carta.');
+      }
+      socket.emit('gameAction', { action: 'coupDrop', param: cardName });
+      myCards.splice(
+        myCards.findIndex((card) => card.name === cardName),
+        1
+      );
     },
   };
 
@@ -82,12 +95,12 @@ socket.on('connect', () => {
 
     // Check if the message is a game command
     if (message.startsWith('/')) {
-      const [command, target] = message.trim().split(" "); // Remove os espaços extra e divide por " "
-      console.log(command, target)
+      const [command, param] = message.trim().split(' '); // Remove os espaços extra e divide por " "
+      // Esse parâmetro é opcional, então pode ser undefined. Ele pode ser um jogador alvo, ou o nome de uma carta (no caso de coupDrop)
       const gameAction = inGameActions[command];
       if (gameAction) {
         if (game.state.isStarted) {
-          gameAction(target);
+          gameAction(param);
         } else {
           // TODO: Informar que o jogo não está iniciado
         }

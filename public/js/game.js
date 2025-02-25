@@ -44,15 +44,18 @@ export class Game {
     playerInTurn: null,
   };
   deck = null;
+  coupedCards = [];
   playerCards = {};
- 
+
   constructor() {
     this.state = {
       players: {},
       isStarted: false,
+      playerInTurn: null,
     };
     this.deck = null;
     this.playerCards = {};
+    this.coupedCards = [];
   }
 
   updateGame(gameState) {
@@ -65,6 +68,10 @@ export class Game {
 
   removePlayer(playerId) {
     delete this.state.players[playerId];
+  }
+
+  #isAlive(playerId) {
+    return this.playerCards[playerId]?.length > 0;
   }
 
   startGame() {
@@ -105,11 +112,8 @@ export class Game {
     this.state.players[playerId].coins += amount;
   }
 
-  getPlayerByName(name){
-    console.log(name)
-    console.log(this.state.players)
+  getPlayerByName(name) {
     for (const [_id, player] of Object.entries(this.state.players)) {
-      console.log(player)
       if (player.name === name) return player;
     }
     return null;
@@ -132,32 +136,78 @@ export class Game {
 
   // capitão
   steal(playerId, targetPlayerId) {
-    const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2)
-    
-    this.state.players[playerId].coins = this.state.players[playerId].coins + amountStealed;
-    this.state.players[targetPlayerId].coins = this.state.players[targetPlayerId].coins - amountStealed;
+    if (!this.#isAlive(targetPlayerId)) return false;
+    const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2);
+
+    this.state.players[playerId].coins =
+      this.state.players[playerId].coins + amountStealed;
+    this.state.players[targetPlayerId].coins =
+      this.state.players[targetPlayerId].coins - amountStealed;
 
     return amountStealed;
   }
 
   // perder carta
+  /**
+   * Remove uma carta do jogador
+   * @param string playerId ID do jogador que está perdendo a carta
+   * @param string cardName Nome da carta que será removida
+   * @returns {Card|null} Retorna a carta removida, ou null se a carta
+   * não foi encontrada
+   */
   dropCard(playerId, cardName) {
-    const index = this.playerCards[playerId].findIndex(c => c.name === cardName);
+    if (!this.#isAlive(playerId)) return null;
+    const index = this.playerCards[playerId].findIndex(
+      (c) => c.name.toLowerCase() === cardName.toLowerCase()
+    );
 
     if (index !== -1) {
-        const removedCard = this.playerCards[playerId].splice(index, 1)[0];
-        return removedCard;  
+      console.log('Card removed:', this.playerCards[playerId]);
+      const removedCard = this.playerCards[playerId].splice(index, 1)[0];
+      console.log('Player cards:', this.playerCards[playerId]);
+      return removedCard;
     } else {
-        return null;  
+      return null;
     }
   }
 
   // golpe de estado
-  //coup(playerId, targetPlayerId){
-  //   if (this.state.players[playerId].coins >= 7)
+  /**
+   *  Tenta realizar um golpe de estado.
+   *
+   * @param {string} playerId - ID do jogador que está tentando realizar o golpe
+   * @param {string} targetPlayerId - ID do jogador que está sendo atacado
+   * @returns {object} - Retorna um objeto com a propriedade `ok` indicando se o golpe pode ser realizado.
+   * Se `ok` for `false`, a propriedade `failMessage` conterá uma mensagem indicando o motivo do golpe não poder ser realizado.
+   */
+  coupAttempt(playerId, targetPlayerId) {
+    if (this.state.players[playerId].coins < 7) {
+      return {
+        ok: false,
+        failMessage: 'Você não tem moedas suficientes para realizar um golpe de estado.',
+      };
+    }
+    if (!this.#isAlive(targetPlayerId)) {
+      return {
+        ok: false,
+        failMessage: 'O jogador alvo não está mais no jogo.',
+      };
+    }
+    return { ok: true };
+  }
 
-  // }
-
+  /**
+   *  Perde uma carta devido a um golpe de estado sofrido.
+   *
+   * @param {string} playerId - ID do jogador que sofreu o golpe
+   * @param {string} cardName - Nome da carta que será perdida
+   * @returns {Card|null} - Retorna a carta removida, ou null se o golpe não pôde ser realizado.
+   */
+  coup(playerId, cardName) {
+    const card = this.dropCard(playerId, cardName);
+    if (card) this.coupedCards.push(card);
+    return card;
+  }
 
   stopGame() {
     this.state.isStarted = false;

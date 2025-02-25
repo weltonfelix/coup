@@ -16,13 +16,17 @@ const game = new Game();
 const commandHandler = new CommandHandler(game, io);
 const gameActionHandler = new GameActionHandler(game);
 const messages = [];
+/**
+ * This variable is used to store the actual player in turn when a coup is attempted
+ */
+let auxPlayerInTurn = '';
 
-function sendMessageToAll(message){
+function sendMessageToAll(message) {
   io.emit('messageReceived', message);
   messages.push(message);
 }
 
-function sendMessageToOthers(socket, message){
+function sendMessageToOthers(socket, message) {
   socket.broadcast.emit('messageReceived', message);
   messages.push(message);
 }
@@ -33,7 +37,7 @@ function nextTurn() {
   sendMessageToAll({
     player: { name: 'JOGO' },
     message: `É a vez de ${game.state.players[game.state.playerInTurn].name}.`,
-  })
+  });
 }
 
 io.on('connection', (socket) => {
@@ -45,25 +49,23 @@ io.on('connection', (socket) => {
   const formattedPlayer = `${player.name} - ${player.id}`;
   console.log(`Player connected: ${player.name} - ${player.id}`);
 
-   for (const message of messages) {
+  for (const message of messages) {
     socket.emit('messageReceived', message);
   }
-  
-  if (!game.state.isStarted){
+
+  if (!game.state.isStarted) {
     game.addPlayer(player);
     io.emit('updateGame', game.state);
     sendMessageToAll({
-      player: {name: 'JOGO'},
+      player: { name: 'JOGO' },
       message: `${player.name} entrou no jogo!`,
     });
   } else {
     sendMessageToAll({
-      player: {name: 'JOGO'},
+      player: { name: 'JOGO' },
       message: `${player.name} entrou como espectador`,
     });
   }
-
- 
 
   socket.on('sendMessage', (message, callback) => {
     console.log(`Player ${formattedPlayer} sent: ${message}`);
@@ -76,7 +78,7 @@ io.on('connection', (socket) => {
     game.removePlayer(player.id);
     if (game.state.players.length === 0) {
       game.stopGame();
-      messages = []
+      messages = [];
     }
     socket.broadcast.emit('updateGame', game.state);
   });
@@ -95,10 +97,6 @@ io.on('connection', (socket) => {
       )}`,
     });
     sendMessageToAll({
-      player: {name: 'JOGO'},
-      message: `Comandos do jogo: <br/>`
-    })
-    sendMessageToAll({
       player: { name: 'JOGO' },
       message: `É a vez de ${
         game.state.players[game.state.playerInTurn].name
@@ -112,8 +110,7 @@ io.on('connection', (socket) => {
     io.emit('updateGame', game.state);
   });
 
-  socket.on('gameAction', ({ action, target }) => {
-    console.log(action, target)
+  socket.on('gameAction', ({ action, param }) => {
     if (player.id !== game.state.playerInTurn) {
       return sendMessageToAll({
         player: { name: 'JOGO' },
@@ -131,10 +128,54 @@ io.on('connection', (socket) => {
         message = gameActionHandler.foreignAid(player);
         break;
       case 'steal':
-        message = gameActionHandler.steal(player, target);
+        message = gameActionHandler.steal(player, param);
         break;
       case 'tax':
         message = gameActionHandler.tax(player);
+        break;
+      case 'coup':
+        const {
+          message: coupMessage,
+          proceed,
+          targetId,
+        } = gameActionHandler.coupAttempt(player, param);
+        message = coupMessage;
+        if (!proceed) {
+          // Não foi possível realizar o golpe, tentar novamente
+          sendMessageToAll({
+            player: { name: 'JOGO' },
+            message,
+          });
+          return sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `Realize outra ação, ${player.name}.`,
+          });
+        } else {
+          // se o golpe foi bem sucedido, o jogador que levou o golpe perde uma carta. Precisa decidir qual.
+          auxPlayerInTurn = game.state.playerInTurn;
+          game.state.playerInTurn = targetId;
+          io.emit('updateGame', game.state);
+          sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `${player.name} deu um golpe em ${game.state.players[targetId].name}!`,
+          });
+          return sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `${game.state.players[targetId].name}, escolha uma carta para perder.`,
+          });
+        }
+        break;
+      case 'coupDrop':
+        message = gameActionHandler.coup(player, param);
+        if (!message) {
+          return sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `Carta inválida, ${player.name}. Descarte uma carta.`,
+          });
+        }
+        io.emit('updateGame', game.state);
+        game.state.playerInTurn = auxPlayerInTurn;
+        auxPlayerInTurn = null;
         break;
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);
