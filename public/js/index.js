@@ -46,9 +46,17 @@ socket.on('connect', () => {
 
   const inGameActions = {
     '/moedas': () => {
-      renderSecretMessage(
-        `Você tem ${game.state.players[myPlayerId].coins} moedas.`
-      );
+      const players = game.state.players;
+      let message = '';
+      for (const [playerId, player] of Object.entries(players)) {
+        if (playerId === myPlayerId) {
+          message += `Você tem ${myPlayerId.coins} moedas.\n`
+        }
+        else {
+          message += `${player.name}: ${player.coins} moedas.\n`
+        }
+      }
+      renderSecretMessage(message);
     },
     '/cartas': () => {
       renderSecretMessage(
