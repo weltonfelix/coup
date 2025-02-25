@@ -48,10 +48,10 @@ socket.on('connect', () => {
     '/moedas': () => {
       const players = game.state.players;
       let message = '';
-      message += `Você: ${players[myPlayerId].coins} moedas.\n`
+      message += `Você: ${players[myPlayerId].coins} moedas.\n`;
       for (const [playerId, player] of Object.entries(players)) {
         if (playerId !== myPlayerId) {
-          message += `${player.name}: ${player.coins} moedas.\n`
+          message += `${player.name}: ${player.coins} moedas.\n`;
         }
       }
       renderSecretMessage(message);
