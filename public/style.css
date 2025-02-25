@@ -27,7 +27,9 @@ input#input {
 
 #messages {
   display: flex;
+  height: calc(100% - 4rem);
   height: calc(100vh - 4rem);
+  height: calc(100dvh - 4rem);
   flex-direction: column;
   gap: 0.5rem;
   padding: 0.5rem;
