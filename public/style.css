@@ -30,7 +30,8 @@ input#input {
   height: calc(100% - 4rem);
   height: calc(100vh - 4rem);
   height: calc(100dvh - 4rem);
-  flex-direction: column;
+  flex-direction: column-reverse; /* Reverse the order of messages, so the latest one is at the bottom.
+                                    This is to make the scrollbar start at the bottom. */
   gap: 0.5rem;
   padding: 0.5rem;
   overflow-y: scroll;
@@ -45,7 +46,7 @@ input#input {
   position: relative;
 }
 
-#messages li.sent{
+#messages li.sent {
   background-color: #a5d3c9;
   margin-left: 5rem;
   border-bottom-right-radius: 0;
@@ -57,7 +58,7 @@ input#input {
   top: 50%;
   right: 0.5rem;
   font-size: 1rem;
-  color: #4CAF50; /* Green for visibility */
+  color: #4caf50; /* Green for visibility */
   transform: translateY(-50%);
 }
 
@@ -85,8 +86,7 @@ input#input {
   }
 }
 
-
-#messages li.received{
+#messages li.received {
   background-color: #b6bae5;
   margin-right: 5rem;
   border-bottom-left-radius: 0;

@@ -7,7 +7,7 @@ export class Renderer {
     const el = this.#createMessageEl(true);
     el.classList.add('message-loading');
     el.innerHTML = `<p>${message}</p>`;
-    this.containerEl.appendChild(el);
+    this.containerEl.prepend(el); // Add the message to the top of the list (most recent)
     return el;
   }
 
