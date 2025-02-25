@@ -140,6 +140,25 @@ export class Game {
     return amountStealed;
   }
 
+  // perder carta
+  dropCard(playerId, cardName) {
+    const index = this.playerCards[playerId].findIndex(c => c.name === cardName);
+
+    if (index !== -1) {
+        const removedCard = this.playerCards[playerId].splice(index, 1)[0];
+        return removedCard;  
+    } else {
+        return null;  
+    }
+  }
+
+  // golpe de estado
+  //coup(playerId, targetPlayerId){
+  //   if (this.state.players[playerId].coins >= 7)
+
+  // }
+
+
   stopGame() {
     this.state.isStarted = false;
     this.deck = null;
