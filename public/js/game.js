@@ -45,7 +45,7 @@ export class Game {
   };
   deck = null;
   playerCards = {};
-
+ 
   constructor() {
     this.state = {
       players: {},
@@ -105,6 +105,16 @@ export class Game {
     this.state.players[playerId].coins += amount;
   }
 
+  getPlayerByName(name){
+    console.log(name)
+    console.log(this.state.players)
+    for (const [_id, player] of Object.entries(this.state.players)) {
+      console.log(player)
+      if (player.name === name) return player;
+    }
+    return null;
+  }
+
   // renda
   income(playerId) {
     this.#drawCoins(playerId, 1);
@@ -122,15 +132,12 @@ export class Game {
 
   // capitão
   steal(playerId, targetPlayerId) {
-    this.state.players[playerId].coins = min(
-      this.state.players[playerId].coins + 2,
-      this.state.players[targetPlayerId].coins +
-        this.state.players[playerId].coins
-    );
-    this.state.players[targetPlayerId].coins = max(
-      0,
-      this.state.players[targetPlayerId].coins - 2
-    );
+    const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2)
+    
+    this.state.players[playerId].coins = this.state.players[playerId].coins + amountStealed;
+    this.state.players[targetPlayerId].coins = this.state.players[targetPlayerId].coins - amountStealed;
+
+    return amountStealed;
   }
 
   stopGame() {

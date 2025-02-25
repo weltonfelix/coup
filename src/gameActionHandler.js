@@ -15,4 +15,9 @@ export class GameActionHandler{
     this.game.foreignAid(player.id);
     return `${player.name} pediu ajuda externa (2 moedas).`;
   }
+
+  steal(player, target){
+    const amount = this.game.steal(player.id, this.game.getPlayerByName(target).id);
+    return `${player.name} roubou ${amount} moeda${amount !== 1 ? 's' : ''} de ${target}.`;
+  }
 }

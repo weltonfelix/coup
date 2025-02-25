@@ -61,25 +61,32 @@ socket.on('connect', () => {
     '/ajudaexterna': () => {
       socket.emit('gameAction', {action:'foreignAid'});
     },
+    '/roubar': (target) => {
+      console.log('aaa', target)
+      socket.emit('gameAction', {action:'steal', target});
+    },
   };
 
   formElement.addEventListener('submit', (event) => {
     event.preventDefault();
     const message = inputElement.value;
+    if (message.length === 0) return;
 
     // Check if the message is a game command
     if (message.startsWith('/')) {
-      const gameAction = inGameActions[message];
+      const [command, target] = message.trim().split(" "); // Remove os espaços extra e divide por " "
+      console.log(command, target)
+      const gameAction = inGameActions[command];
       if (gameAction) {
         if (game.state.isStarted) {
-          gameAction();
+          gameAction(target);
         } else {
           // TODO: Informar que o jogo não está iniciado
         }
       } else {
-        const command = commands[message];
-        if (command) {
-          command();
+        const gameCommand = commands[command];
+        if (gameCommand) {
+          gameCommand();
         } else {
           sendTextMessage(message);
         }
