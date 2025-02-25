@@ -42,6 +42,7 @@ input#input {
   padding: 0.5rem;
   border-radius: 0.5rem;
   font-size: 1rem;
+  position: relative;
 }
 
 #messages li.sent{
@@ -49,6 +50,41 @@ input#input {
   margin-left: 5rem;
   border-bottom-right-radius: 0;
 }
+
+#messages li.message-sent::after {
+  content: '✔'; /* Unicode check mark */
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  font-size: 1rem;
+  color: #4CAF50; /* Green for visibility */
+  transform: translateY(-50%);
+}
+
+/* Spinner for messages that are still loading */
+#messages li.message-loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  right: 0.5rem;
+  width: 1rem;
+  height: 1rem;
+  border: 2px solid #ccc;
+  border-top-color: #3498db; /* Blue accent */
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  transform: translateY(-50%);
+}
+
+@keyframes spin {
+  from {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateY(-50%) rotate(360deg);
+  }
+}
+
 
 #messages li.received{
   background-color: #b6bae5;

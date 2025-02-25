@@ -5,8 +5,10 @@ export class Renderer {
 
   renderSentMessage(message) {
     const el = this.#createMessageEl(true);
+    el.classList.add('message-loading');
     el.innerHTML = `<p>${message}</p>`;
     this.containerEl.appendChild(el);
+    return el;
   }
 
   renderReceivedMessage(player, message) {

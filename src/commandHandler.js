@@ -33,7 +33,7 @@ export class CommandHandler {
     const playersOrder = [playerInTurn];
     this.game.nextTurn(); // Skip the player in turn
     while (this.game.state.playerInTurn !== playerInTurn) {
-      playersOrder.push(game.state.playerInTurn);
+      playersOrder.push(this.game.state.playerInTurn);
       this.game.nextTurn();
     }
 

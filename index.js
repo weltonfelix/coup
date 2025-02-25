@@ -36,9 +36,10 @@ io.on('connection', (socket) => {
   game.addPlayer(player);
   io.emit('updateGame', game.state);
 
-  socket.on('sendMessage', (message) => {
+  socket.on('sendMessage', (message, callback) => {
     console.log(`Player ${formattedPlayer} sent: ${message}`);
     socket.broadcast.emit('messageReceived', { player, message });
+    callback(); // Essa função é chamada para confirmar ao cliente que a mensagem foi recebida
   });
 
   socket.on('disconnect', () => {
@@ -113,6 +114,7 @@ io.on('connection', (socket) => {
   });
 });
 
-server.listen(3000, () => {
-  console.log('Server is running on port 3000');
+const port = process.env.PORT || 3000;
+server.listen(port, () => {
+  console.log('Server is running on port ' + port);
 });

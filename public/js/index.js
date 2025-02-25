@@ -20,8 +20,11 @@ const socket = io({
 });
 
 function sendTextMessage(message) {
-  socket.emit('sendMessage', message);
-  messageRenderer.renderSentMessage(message);
+  const el = messageRenderer.renderSentMessage(message);
+  socket.emit('sendMessage', message, () => {
+    el.classList.remove('message-loading');
+    el.classList.add('message-sent');
+  }); // Essa função é chamada quando o servidor confirma o recebimento da mensagem
 }
 
 function renderSecretMessage(message) {
