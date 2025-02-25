@@ -31,3 +31,5 @@ Precisa ter o [`node` instalado](https://nodejs.org/).
   ```
 
 - Acesse [http://localhost:3000](http://localhost:3000)
+
+- Acessar site [https://coup-zdtw.onrender.com/](https://coup-zdtw.onrender.com/)
