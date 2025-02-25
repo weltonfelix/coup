@@ -20,4 +20,9 @@ export class GameActionHandler{
     const amount = this.game.steal(player.id, this.game.getPlayerByName(target).id);
     return `${player.name} roubou ${amount} moeda${amount !== 1 ? 's' : ''} de ${target}.`;
   }
+
+  tax(player){
+    this.game.tax(player.id);
+    return `${player.name} pediu imposto (3 moedas).`;
+  }
 }

@@ -131,7 +131,10 @@ io.on('connection', (socket) => {
         message = gameActionHandler.foreignAid(player);
         break;
       case 'steal':
-        message = gameActionHandler.steal(player, target)
+        message = gameActionHandler.steal(player, target);
+        break;
+      case 'tax':
+        message = gameActionHandler.tax(player);
         break;
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);

@@ -62,8 +62,10 @@ socket.on('connect', () => {
       socket.emit('gameAction', {action:'foreignAid'});
     },
     '/roubar': (target) => {
-      console.log('aaa', target)
       socket.emit('gameAction', {action:'steal', target});
+    },
+    '/imposto': () => {
+      socket.emit('gameAction', {action:'tax'});
     },
   };
 
