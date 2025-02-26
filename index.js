@@ -40,6 +40,47 @@ function nextTurn() {
   });
 }
 
+function resetGame() {
+  console.log('Adding spectators to the next game');
+  for (const [id, socket] of io.sockets.sockets) {
+    console.log(`Checking socket ${id}`);
+    const playerName = socket.handshake.auth.name;
+    console.log(`Player name: ${playerName}`);
+    if (!game.getPlayerByName(playerName)) {
+      // Criar um novo jogador para o próximo jogo
+      const newPlayer = {
+        id,
+        name: playerName,
+        coins: 0,
+      };
+      game.addPlayer(newPlayer);
+    }
+  }
+  io.emit('updateGame', game.state);
+}
+
+function checkGameWon() {
+  return (
+    Object.values(game.state.players).filter(
+      (p) => game.playerCards[p.id].length > 0
+    ).length === 1
+  );
+}
+
+function handleGameWon() {
+  const winner = Object.values(game.state.players).find(
+    (p) => game.playerCards[p.id].length > 0
+  );
+  console.log(`Player ${winner.name} won the game`);
+  io.emit('messageReceived', {
+    player: { name: 'JOGO' },
+    message: `${winner.name} venceu o jogo!`,
+  });
+  game.stopGame();
+  io.emit('updateGame', game.state);
+  resetGame();
+}
+
 io.on('connection', (socket) => {
   console.log(
     `${socket.id} trying to connect using name: ${socket.handshake.auth.name}`
@@ -107,6 +148,22 @@ io.on('connection', (socket) => {
     return true;
   }
 
+  /**
+   * Verifica se o jogador perdeu o jogo
+   * @returns {boolean} Retorna `true` se o jogador perdeu, `false` caso contrário
+   */
+  function checkLose() {
+    console.log(game.playerCards);
+    console.log(game.playerCards[player.id]);
+    if (game.playerCards[player.id].length === 0) {
+      console.log(`Player ${formattedPlayer} lost`);
+      io.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: `${player.name} perdeu!`,
+      });
+      socket.broadcast.emit('updateGame', game.state);
+      return true;
+    }
   }
 
   socket.on('sendMessage', (message, callback) => {
@@ -118,7 +175,7 @@ io.on('connection', (socket) => {
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${formattedPlayer}`);
     game.removePlayer(player.id);
-    if (game.state.players.length === 0) {
+    if (Object.keys(game.state.players).length === 0) {
       game.stopGame();
       messages = [];
     }
@@ -152,6 +209,13 @@ io.on('connection', (socket) => {
     commandHandler.stopGame();
     console.log(`----- GAME STOPPED (by ${formattedPlayer}) -----`);
     io.emit('updateGame', game.state);
+    
+    resetGame();
+
+    sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: 'O jogo foi encerrado.',
+    });
   });
 
   socket.on('gameAction', ({ action, param }) => {
@@ -235,6 +299,13 @@ io.on('connection', (socket) => {
       player: { name: 'JOGO' },
       message,
     });
+
+    if (checkLose()) {
+      if (checkGameWon()) {
+        handleGameWon();
+        return;
+      }
+    }
     nextTurn();
 
     io.emit('updateGame', game.state);
