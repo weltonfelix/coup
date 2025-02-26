@@ -80,7 +80,7 @@ socket.on('connect', () => {
       socket.emit('gameAction', { action: 'coup', param: target });
     },
     '/coupdrop': (cardName) => {
-      if (!myCards.find((card) => card.name === cardName)) {
+      if (!myCards.find((card) => card.name.toLowerCase() === cardName.toLowerCase())) {
         return renderSecretMessage('Você não tem essa carta.');
       }
       socket.emit('gameAction', { action: 'coupDrop', param: cardName });

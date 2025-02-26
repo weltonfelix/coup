@@ -116,7 +116,7 @@ export class Game {
 
   getPlayerByName(name) {
     for (const [_id, player] of Object.entries(this.state.players)) {
-      if (player.name === name) return player;
+      if (player.name.toLowerCase() === name.toLowerCase()) return player;
     }
     return null;
   }
@@ -215,5 +215,14 @@ export class Game {
     this.state.isStarted = false;
     this.deck = null;
     this.playerCards = {};
+  }
+
+  /**
+   * Verifica se um jogador está no jogo atual.
+   * @param {string} playerId - ID do jogador
+   * @returns {boolean} Retorna `true` se o jogador está no jogo, `false` caso contrário
+   */
+  isPlayerInGame(playerId) {
+    return this.state.players[playerId] !== undefined;
   }
 }
