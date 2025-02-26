@@ -41,6 +41,29 @@ function nextTurn() {
 }
 
 io.on('connection', (socket) => {
+  console.log(
+    `${socket.id} trying to connect using name: ${socket.handshake.auth.name}`
+  );
+  if (!socket.handshake.auth.name) {
+    console.log('Player disconnected: No name provided');
+    socket.emit('messageReceived', {
+      player: { name: 'JOGO' },
+      message:
+        'Nome de jogador não fornecido. Recarregue a página e tente novamente.',
+    });
+    return socket.disconnect();
+  }
+
+  if (game.getPlayerByName(socket.handshake.auth.name)) {
+    console.log('Player disconnected: Name already in use');
+    socket.emit('messageReceived', {
+      player: { name: 'JOGO' },
+      message:
+        'Nome de jogador já em uso. Recarregue a página e tente novamente.',
+    });
+    return socket.disconnect();
+  }
+
   const player = {
     id: socket.id,
     name: socket.handshake.auth.name,
