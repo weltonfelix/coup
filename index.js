@@ -15,7 +15,7 @@ app.use(express.static('public'));
 const game = new Game();
 const commandHandler = new CommandHandler(game, io);
 const gameActionHandler = new GameActionHandler(game);
-const messages = [];
+let messages = [];
 /**
  * This variable is used to store the actual player in turn when a coup is attempted
  */
