@@ -82,11 +82,13 @@ export class Game {
    * @property {object.<string, Player>} players - Jogadores do jogo
    * @property {boolean} isStarted - Indica se o jogo está iniciado
    * @property {string} playerInTurn - ID do jogador em turno
+   * @property {boolean} dropCardTurn - Indica se é a vez de descartar uma carta
    */
   state = {
     players: {},
     isStarted: false,
     playerInTurn: null,
+    dropCardTurn: false,
   };
   /**
    * Baralho do jogo
@@ -114,6 +116,7 @@ export class Game {
       players: {},
       isStarted: false,
       playerInTurn: null,
+      dropCardTurn: false,
     };
     this.deck = null;
     this.playerCards = {};
@@ -264,6 +267,7 @@ export class Game {
    * @returns {number|boolean} Retorna a quantidade de moedas roubadas, ou `false` se o jogador alvo não está mais no jogo
    */
   steal(playerId, targetPlayerId) {
+    if (playerId === targetPlayerId) return false;
     if (!this.#isAlive(targetPlayerId)) return false;
     const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2);
 
@@ -282,17 +286,14 @@ export class Game {
    * @returns {Card|null} Retorna a carta removida, ou null se a carta
    * não foi encontrada
    */
-  dropCard(playerId, cardName) {
+  #dropCard(playerId, cardName) {
     if (!this.#isAlive(playerId)) return null;
     const index = this.playerCards[playerId].findIndex(
       (c) => c.name.toLowerCase() === cardName.toLowerCase()
     );
 
     if (index !== -1) {
-      console.log('Card removed:', this.playerCards[playerId]);
-      const removedCard = this.playerCards[playerId].splice(index, 1)[0];
-      console.log('Player cards:', this.playerCards[playerId]);
-      return removedCard;
+      return this.playerCards[playerId].splice(index, 1)[0];
     } else {
       return null;
     }
@@ -307,10 +308,17 @@ export class Game {
    * Se `ok` for `false`, a propriedade `failMessage` conterá uma mensagem indicando o motivo do golpe não poder ser realizado.
    */
   coupAttempt(playerId, targetPlayerId) {
+    if (playerId === targetPlayerId) {
+      return {
+        ok: false,
+        failMessage: 'Você não pode realizar um golpe de estado em si mesmo.',
+      };
+    }
     if (this.state.players[playerId].coins < 7) {
       return {
         ok: false,
-        failMessage: 'Você não tem moedas suficientes para realizar um golpe de estado.',
+        failMessage:
+          'Você não tem moedas suficientes para realizar um golpe de estado.',
       };
     }
     if (!this.#isAlive(targetPlayerId)) {
@@ -331,7 +339,7 @@ export class Game {
    * @returns {Card|null} - Retorna a carta removida, ou null se o golpe não pôde ser realizado.
    */
   coup(playerId, cardName) {
-    const card = this.dropCard(playerId, cardName);
+    const card = this.#dropCard(playerId, cardName);
     if (card) this.coupedCards.push(card);
     return card;
   }
@@ -344,6 +352,10 @@ export class Game {
     this.state.isStarted = false;
     this.deck = null;
     this.playerCards = {};
+    this.coupedCards = [];
+    this.state.players = {};
+    this.state.playerInTurn = null;
+    this.state.dropCardTurn = false;
   }
 
   /**

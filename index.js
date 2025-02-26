@@ -41,6 +41,13 @@ function nextTurn() {
 }
 
 function resetGame() {
+  game.state = {
+    players: {},
+    isStarted: false,
+    playerInTurn: null,
+    dropCardTurn: false,
+  }
+  game.deck = null;
   console.log('Adding spectators to the next game');
   for (const [id, socket] of io.sockets.sockets) {
     console.log(`Checking socket ${id}`);
@@ -85,7 +92,7 @@ io.on('connection', (socket) => {
   console.log(
     `${socket.id} trying to connect using name: ${socket.handshake.auth.name}`
   );
-  if (!socket.handshake.auth.name) {
+  if (!socket.handshake.auth.name.trim()) {
     console.log('Player disconnected: No name provided');
     socket.emit('messageReceived', {
       player: { name: 'JOGO' },
@@ -95,7 +102,9 @@ io.on('connection', (socket) => {
     return socket.disconnect();
   }
 
-  if (game.getPlayerByName(socket.handshake.auth.name)) {
+  if (game.getPlayerByName(socket.handshake.auth.name) || socket.handshake.auth.name === 'JOGO') {
+    // Se o jogador já estiver no jogo, ou se o nome for "JOGO", desconectar
+    // "JOGO" é o nome reservado para o sistema de mensagens
     console.log('Player disconnected: Name already in use');
     socket.emit('messageReceived', {
       player: { name: 'JOGO' },
@@ -153,8 +162,6 @@ io.on('connection', (socket) => {
    * @returns {boolean} Retorna `true` se o jogador perdeu, `false` caso contrário
    */
   function checkLose() {
-    console.log(game.playerCards);
-    console.log(game.playerCards[player.id]);
     if (game.playerCards[player.id].length === 0) {
       console.log(`Player ${formattedPlayer} lost`);
       io.emit('messageReceived', {
@@ -209,7 +216,7 @@ io.on('connection', (socket) => {
     commandHandler.stopGame();
     console.log(`----- GAME STOPPED (by ${formattedPlayer}) -----`);
     io.emit('updateGame', game.state);
-    
+
     resetGame();
 
     sendMessageToAll({
@@ -228,6 +235,16 @@ io.on('connection', (socket) => {
     }
 
     let message = '';
+
+    if (game.state.dropCardTurn) {
+      // Se o turno de descarte de carta estiver ativo, o jogador deve descartar uma carta
+      if (action !== 'coupDrop') {
+        return socket.emit('messageReceived', {
+          player: { name: 'JOGO' },
+          message: `Você precisa descartar uma carta, ${player.name}.`,
+        });
+      }
+    }
 
     switch (action) {
       case 'income':
@@ -263,6 +280,7 @@ io.on('connection', (socket) => {
           // se o golpe foi bem sucedido, o jogador que levou o golpe perde uma carta. Precisa decidir qual.
           auxPlayerInTurn = game.state.playerInTurn;
           game.state.playerInTurn = targetId;
+          game.state.dropCardTurn = true;
           io.emit('updateGame', game.state);
           sendMessageToAll({
             player: { name: 'JOGO' },
@@ -282,8 +300,9 @@ io.on('connection', (socket) => {
             message: `Carta inválida, ${player.name}. Descarte uma carta.`,
           });
         }
-        io.emit('updateGame', game.state);
         game.state.playerInTurn = auxPlayerInTurn;
+        game.state.dropCardTurn = false;
+        io.emit('updateGame', game.state);
         auxPlayerInTurn = null;
         break;
       default:
