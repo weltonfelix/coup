@@ -1,4 +1,17 @@
-// coup cards
+/**
+ * @typedef {object} Player
+ * @property {string} id - ID do jogador
+ * @property {string} name - Nome do jogador
+ * @property {number} coins - Quantidade de moedas do jogador
+ */
+
+/**
+ * Carta do jogo
+ * @class
+ * @property {string} name - Nome da carta
+ * @constructor
+ * @param {string} name - Nome da carta
+ */
 class Card {
   name;
   constructor(name) {
@@ -6,6 +19,14 @@ class Card {
   }
 }
 
+/**
+ * Baralho do jogo
+ * @class
+ * @property {Card[]} cards - Cartas do baralho
+ * @constructor
+ * @param {Card[]} cards - Cartas do baralho
+ * @method draw - Retira uma carta do baralho
+ */
 export class Deck {
   cards;
 
@@ -19,10 +40,18 @@ export class Deck {
     console.log(this.cards);
   }
 
+  /**
+   * Retira uma carta do baralho
+   * @returns {Card} Retorna a carta retirada do baralho
+   */
   draw() {
     return this.cards.pop();
   }
 
+  /**
+   * Embaralha as cartas do baralho
+   * @returns {void}
+   */
   shuffle() {
     for (let i = this.cards.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * i);
@@ -32,19 +61,52 @@ export class Deck {
     }
   }
 
+  /**
+   * Adiciona uma carta ao baralho
+   * @param {Card} card - Carta a ser adicionada ao baralho
+   * @returns {void}
+   */
   add(card) {
     this.cards.push(card);
   }
 }
 
+/**
+ * Jogo
+ * @class
+ */
 export class Game {
+  /**
+   * Estado do jogo
+   * @typedef {object} GameState
+   * @property {object.<string, Player>} players - Jogadores do jogo
+   * @property {boolean} isStarted - Indica se o jogo está iniciado
+   * @property {string} playerInTurn - ID do jogador em turno
+   */
   state = {
     players: {},
     isStarted: false,
     playerInTurn: null,
   };
+  /**
+   * Baralho do jogo
+   * @type {Deck}
+   */
   deck = null;
+  /**
+   * Cartas retiradas do jogo
+   * @type {Card[]}
+   */
   coupedCards = [];
+  /**
+   * Cartas dos jogadores
+   * @type {object.<string, Card[]>}
+   * @example
+   * {
+   *  'player1': [new Card('Duque'), new Card('Capitão')],
+   *  'player2': [new Card('Duque'), new Card('Capitão')],
+   * }
+   */
   playerCards = {};
 
   constructor() {
@@ -58,22 +120,47 @@ export class Game {
     this.coupedCards = [];
   }
 
+  /**
+   * Substitui o estado do jogo
+   * @param {GameState} gameState - Novo estado do jogo
+   * @returns {void}
+   */
   updateGame(gameState) {
     this.state = gameState;
   }
 
+  /**
+   * Adiciona um jogador ao jogo
+   * @param {Player} player - Jogador a ser adicionado
+   */
   addPlayer(player) {
     this.state.players[player.id] = player;
   }
 
+  /**
+   * Remove um jogador do jogo
+   * @param {string} playerId - ID do jogador a ser removido
+   */
   removePlayer(playerId) {
     delete this.state.players[playerId];
   }
 
+  /**
+   * Verifica se um jogador está vivo
+   * @param {string} playerId - ID do jogador
+   * @returns {boolean} Retorna `true` se o jogador está vivo, `false` caso contrário
+   * @private
+   */
   #isAlive(playerId) {
     return this.playerCards[playerId]?.length > 0;
   }
 
+  /**
+   * Inicia o jogo, caso ainda não tenha sido iniciado.
+   * Embaralha um novo baralho e distribui 2 cartas e 2 moedas para cada jogador.
+   * Além disso, define um jogador aleatório para começar.
+   * @returns {void}
+   */
   startGame() {
     if (this.state.isStarted) {
       return;
@@ -94,9 +181,12 @@ export class Game {
     this.state.playerInTurn = Object.keys(this.state.players)[
       Math.floor(Math.random() * Object.keys(this.state.players).length)
     ];
-    //TODO: implement game logic
   }
 
+  /**
+   * Passa o turno para o próximo jogador, de acordo com a ordem dos jogadores.
+   * @returns {void}
+   */
   nextTurn() {
     const players = Object.keys(this.state.players);
     const currentPlayerIndex = players.indexOf(this.state.playerInTurn);
@@ -106,14 +196,33 @@ export class Game {
       this.nextTurn();
     }
   }
+
+  /**
+   * Distribui 2 cartas iniciais para um jogador
+   * @param {string} playerId - ID do jogador
+   * @returns {void}
+   * @private
+   */
   #drawInitialPlayerCards(playerId) {
     this.playerCards[playerId] = [this.deck.draw(), this.deck.draw()];
   }
 
+  /**
+   * Dá moedas a um jogador
+   * @param {string} playerId - ID do jogador
+   * @param {number} amount - Quantidade de moedas a ser dada
+   * @returns {void}
+   * @private
+   */
   #drawCoins(playerId, amount) {
     this.state.players[playerId].coins += amount;
   }
 
+  /**
+   * Retorna um jogador pelo nome
+   * @param {string} name - Nome do jogador
+   * @returns {Player|null} Retorna o jogador, ou `null` se não encontrado
+   */
   getPlayerByName(name) {
     for (const [_id, player] of Object.entries(this.state.players)) {
       if (player.name.toLowerCase() === name.toLowerCase()) return player;
@@ -121,22 +230,39 @@ export class Game {
     return null;
   }
 
-  // renda
+  /**
+   * Distribui renda para um jogador. Isto é, dá 1 moeda para o jogador.
+   * @param {string} playerId - ID do jogador
+   * @returns {void}
+   */
   income(playerId) {
     this.#drawCoins(playerId, 1);
   }
 
-  // ajuda externa
+  /**
+   * Pede ajuda externa. Isto é, dá 2 moedas para o jogador.
+   * @param {string} playerId - ID do jogador
+   * @returns {void}
+   */
   foreignAid(playerId) {
     this.#drawCoins(playerId, 2);
   }
 
-  // duque
+  /**
+   * Pede imposto. Isto é, dá 3 moedas para o jogador. Ação do Duque.
+   * @param {string} playerId - ID do jogador
+   * @returns {void}
+   */
   tax(playerId) {
     this.#drawCoins(playerId, 3);
   }
 
-  // capitão
+  /**
+   * Tenta aceitar suborno de um jogador. Isto é, roubar 2 moedas de um jogador.
+   * @param {string} playerId - ID do jogador que está tentando roubar
+   * @param {string} targetPlayerId - ID do jogador que está sendo roubado
+   * @returns {number|boolean} Retorna a quantidade de moedas roubadas, ou `false` se o jogador alvo não está mais no jogo
+   */
   steal(playerId, targetPlayerId) {
     if (!this.#isAlive(targetPlayerId)) return false;
     const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2);
@@ -149,7 +275,6 @@ export class Game {
     return amountStealed;
   }
 
-  // perder carta
   /**
    * Remove uma carta do jogador
    * @param string playerId ID do jogador que está perdendo a carta
@@ -211,6 +336,10 @@ export class Game {
     return card;
   }
 
+  /**
+   * Finaliza o jogo. Limpa o baralho e as cartas dos jogadores.
+   * @returns {void}
+   */
   stopGame() {
     this.state.isStarted = false;
     this.deck = null;
