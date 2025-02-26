@@ -102,8 +102,10 @@ export class Game {
     const currentPlayerIndex = players.indexOf(this.state.playerInTurn);
     const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
     this.state.playerInTurn = players[nextPlayerIndex];
+    while (!this.#isAlive(this.state.playerInTurn)) {
+      this.nextTurn();
+    }
   }
-
   #drawInitialPlayerCards(playerId) {
     this.playerCards[playerId] = [this.deck.draw(), this.deck.draw()];
   }
