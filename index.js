@@ -157,7 +157,7 @@ io.on('connection', (socket) => {
   socket.on('gameAction', ({ action, param }) => {
     if (!checkPlayerInGame()) return;
     if (player.id !== game.state.playerInTurn) {
-      return sendMessageToAll({
+      return socket.emit({
         player: { name: 'JOGO' },
         message: `Não é a sua vez, ${player.name}.`,
       });
