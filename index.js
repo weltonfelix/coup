@@ -88,6 +88,25 @@ io.on('connection', (socket) => {
       player: { name: 'JOGO' },
       message: `${player.name} entrou como espectador`,
     });
+    socket.emit('messageReceived', {
+      player: { name: 'JOGO' },
+      message:
+        'O jogo já começou. Você pode assistir, mas não pode participar.',
+    });
+  }
+
+  function checkPlayerInGame() {
+    if (!game.isPlayerInGame(player.id)) {
+      console.log(`Player ${formattedPlayer} not in game`);
+      socket.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: 'Você não está no jogo! Espere o próximo jogo começar.',
+      });
+      return false;
+    }
+    return true;
+  }
+
   }
 
   socket.on('sendMessage', (message, callback) => {
@@ -110,6 +129,7 @@ io.on('connection', (socket) => {
     if (game.state.isStarted) {
       return; // Game already started
     }
+    if (!checkPlayerInGame()) return;
     const playersOrderNames = commandHandler.startGame(io.sockets.sockets);
     console.log(`----- GAME STARTED (by ${formattedPlayer}) -----`);
     io.emit('updateGame', game.state); // Update game state for all players, since the game has started
@@ -128,12 +148,14 @@ io.on('connection', (socket) => {
   });
 
   socket.on('stopGame', () => {
+    if (!checkPlayerInGame()) return;
     commandHandler.stopGame();
     console.log(`----- GAME STOPPED (by ${formattedPlayer}) -----`);
     io.emit('updateGame', game.state);
   });
 
   socket.on('gameAction', ({ action, param }) => {
+    if (!checkPlayerInGame()) return;
     if (player.id !== game.state.playerInTurn) {
       return sendMessageToAll({
         player: { name: 'JOGO' },

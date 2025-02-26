@@ -44,7 +44,7 @@ socket.on('connect', () => {
   const myPlayerId = socket.id;
   let myCards = [];
 
-  const inGameActions = {
+  const playerActions = {
     '/moedas': () => {
       const players = game.state.players;
       let message = '';
@@ -61,6 +61,9 @@ socket.on('connect', () => {
         `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}.`
       );
     },
+  };
+
+  const inTurnActions = {
     '/renda': () => {
       socket.emit('gameAction', { action: 'income' });
     },
@@ -95,14 +98,30 @@ socket.on('connect', () => {
 
     // Check if the message is a game command
     if (message.startsWith('/')) {
+      console.log(game.state);
+      if (!game.isPlayerInGame(myPlayerId)) {
+        return renderSecretMessage(
+          'Você não está no jogo! Espere o próximo jogo começar.'
+        );
+      }
       const [command, param] = message.trim().split(' '); // Remove os espaços extra e divide por " "
       // Esse parâmetro é opcional, então pode ser undefined. Ele pode ser um jogador alvo, ou o nome de uma carta (no caso de coupDrop)
-      const gameAction = inGameActions[command];
-      if (gameAction) {
+      const playerAction = playerActions[command];
+      const inTurnAction = inTurnActions[command];
+      if (playerAction) {
         if (game.state.isStarted) {
-          gameAction(param);
+          playerAction(param);
         } else {
-          // TODO: Informar que o jogo não está iniciado
+          renderSecretMessage(`O jogo ainda não começou.`);
+        }
+      } else if (inTurnAction) {
+        if (game.state.playerInTurn !== myPlayerId) {
+          return renderSecretMessage(`Não é a sua vez.`);
+        }
+        if (game.state.isStarted) {
+          inTurnAction(param);
+        } else {
+          renderSecretMessage(`O jogo ainda não começou.`);
         }
       } else {
         const gameCommand = commands[command];
@@ -119,11 +138,6 @@ socket.on('connect', () => {
   });
 
   console.log(`${playerName} connected: ${myPlayerId}`);
-  game.addPlayer({
-    id: myPlayerId,
-    name: playerName,
-  });
-
   socket.on('messageReceived', ({ player, message }) => {
     if (player.id === myPlayerId) {
       return;
