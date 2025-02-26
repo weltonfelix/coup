@@ -171,7 +171,6 @@ export class Game {
     }
   }
 
-  // golpe de estado
   /**
    *  Tenta realizar um golpe de estado.
    *
@@ -193,6 +192,7 @@ export class Game {
         failMessage: 'O jogador alvo não está mais no jogo.',
       };
     }
+    this.state.players[playerId].coins -= 7;
     return { ok: true };
   }
 

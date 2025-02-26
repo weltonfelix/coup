@@ -34,7 +34,7 @@ export class GameActionHandler {
   coupAttempt(player, target) {
     const result = this.game.coupAttempt(
       player.id,
-      this.game.getPlayerByName(target).id
+      this.game.getPlayerByName(target)?.id
     );
     if (result.ok) {
       return {
