@@ -89,6 +89,9 @@ socket.on('connect', () => {
         1
       );
     },
+    '/matar': (target) => {
+    socket.emit('gameAction', { action: 'assassin', param: target });
+    },
   };
 
   formElement.addEventListener('submit', (event) => {

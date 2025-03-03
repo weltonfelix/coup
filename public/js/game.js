@@ -36,6 +36,7 @@ export class Deck {
     for (let i = 0; i < 5; i++) {
       this.cards.push(new Card('Duque'));
       this.cards.push(new Card('Capitão'));
+      this.cards.push(new Card('Assassino'));
     }
     console.log(this.cards);
   }
@@ -277,6 +278,35 @@ export class Game {
       this.state.players[targetPlayerId].coins - amountStealed;
 
     return amountStealed;
+  }
+
+  /**
+   * Realiza um assassinato. O jogador paga 3 moedas e o alvo deve descartar uma carta.
+   * @param {string} playerId - ID do jogador que está realizando o assassinato
+   * @param {string} targetPlayerId - ID do jogador alvo
+   * @returns {boolean} Retorna `true` se o assassinato foi bem-sucedido, `false` caso contrário
+   */
+  assassin(playerId, targetPlayerId) {
+    if (playerId === targetPlayerId) {
+      return false; // Não pode se assassinar
+    }
+
+    if (this.state.players[playerId].coins < 3) {
+      return false; // Não tem moedas suficientes
+    }
+
+    if (!this.#isAlive(targetPlayerId)) {
+      return false; // O alvo não está mais no jogo
+    }
+
+    // O jogador paga 3 moedas
+    this.state.players[playerId].coins -= 3;
+
+    // O jogador alvo deve descartar uma carta
+    this.state.dropCardTurn = true;
+    this.state.playerInTurn = targetPlayerId; // O alvo deve escolher uma carta para descartar
+
+    return true;
   }
 
   /**

@@ -50,10 +50,45 @@ export class GameActionHandler {
       };
     }
   }
+  
+    coup(player, cardName) {
+      const card = this.game.coup(player.id, cardName);
+      if (!card) return false;
+      return `${player.name} descartou ${card.name} por um golpe.`;
+    }
 
-  coup(player, cardName) {
-    const card = this.game.coup(player.id, cardName);
-    if (!card) return false;
-    return `${player.name} descartou ${card.name} por um golpe.`;
-  }
+    assassin(player, target) {
+      const targetPlayer = this.game.getPlayerByName(target);
+      if (!targetPlayer) {
+        return {
+          message: 'Jogador alvo não encontrado.',
+          success: false,
+        };
+      }
+  
+      if (player.coins < 3) {
+        return {
+          message: 'Você não tem moedas suficientes para realizar um assassinato.',
+          success: false,
+        };
+      }
+  
+      if (!this.game.isPlayerInGame(targetPlayer.id)) {
+        return {
+          message: 'O jogador alvo não está mais no jogo.',
+          success: false,
+        };
+      }
+  
+      // O jogador paga 3 moedas para realizar o assassinato
+      player.coins -= 3;
+  
+      // O jogador alvo deve descartar uma carta
+      return {
+        message: `${player.name} tentou assassinar ${target}. ${target} deve descartar uma carta.`,
+        success: true,
+        targetId: targetPlayer.id,
+      };
+    }
+
 }

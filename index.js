@@ -263,7 +263,7 @@ io.on('connection', (socket) => {
         const {
           message: coupMessage,
           proceed,
-          targetId,
+          targetId: coupTargetId,
         } = gameActionHandler.coupAttempt(player, param);
         message = coupMessage;
         if (!proceed) {
@@ -305,6 +305,29 @@ io.on('connection', (socket) => {
         io.emit('updateGame', game.state);
         auxPlayerInTurn = null;
         break;
+      
+      case 'assassin':
+        const { message: assassinMessage, success, targetId } = gameActionHandler.assassin(player, param);
+        message = assassinMessage;
+        if (!success) {
+          sendMessageToAll({
+            player: { name: 'JOGO' },
+            message,
+          });
+          return;
+        } else {
+          // Se o assassinato foi bem-sucedido, o jogador alvo deve descartar uma carta
+          game.state.dropCardTurn = true;
+          game.state.playerInTurn = targetId;
+          io.emit('updateGame', game.state);
+          sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `${player.name} tentou assassinar ${param}! ${param} deve descartar uma carta.`,
+          });
+          return;
+        }
+        break;  
+
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);
         return sendMessageToAll({
