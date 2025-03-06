@@ -288,23 +288,22 @@ export class Game {
    */
   assassin(playerId, targetPlayerId) {
     if (playerId === targetPlayerId) {
-      return false; // Não pode se assassinar
+      return false;
     }
 
     if (this.state.players[playerId].coins < 3) {
-      return false; // Não tem moedas suficientes
+      return false;
     }
 
     if (!this.#isAlive(targetPlayerId)) {
-      return false; // O alvo não está mais no jogo
+      return false;
     }
 
-    // O jogador paga 3 moedas
     this.state.players[playerId].coins -= 3;
 
-    // O jogador alvo deve descartar uma carta
     this.state.dropCardTurn = true;
-    this.state.playerInTurn = targetPlayerId; // O alvo deve escolher uma carta para descartar
+    this.state.playerInTurn = targetPlayerId; 
+    
 
     return true;
   }

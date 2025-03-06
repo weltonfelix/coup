@@ -237,7 +237,6 @@ io.on('connection', (socket) => {
     let message = '';
 
     if (game.state.dropCardTurn) {
-      // Se o turno de descarte de carta estiver ativo, o jogador deve descartar uma carta
       if (action !== 'coupDrop') {
         return socket.emit('messageReceived', {
           player: { name: 'JOGO' },
@@ -267,7 +266,6 @@ io.on('connection', (socket) => {
         } = gameActionHandler.coupAttempt(player, param);
         message = coupMessage;
         if (!proceed) {
-          // Não foi possível realizar o golpe, tentar novamente
           sendMessageToAll({
             player: { name: 'JOGO' },
             message,
@@ -277,18 +275,17 @@ io.on('connection', (socket) => {
             message: `Realize outra ação, ${player.name}.`,
           });
         } else {
-          // se o golpe foi bem sucedido, o jogador que levou o golpe perde uma carta. Precisa decidir qual.
           auxPlayerInTurn = game.state.playerInTurn;
-          game.state.playerInTurn = targetId;
+          game.state.playerInTurn = coupTargetId;
           game.state.dropCardTurn = true;
           io.emit('updateGame', game.state);
           sendMessageToAll({
             player: { name: 'JOGO' },
-            message: `${player.name} deu um golpe em ${game.state.players[targetId].name}!`,
+            message: `${player.name} deu um golpe em ${game.state.players[coupTargetId].name}!`,
           });
           return sendMessageToAll({
             player: { name: 'JOGO' },
-            message: `${game.state.players[targetId].name}, escolha uma carta para perder.`,
+            message: `${game.state.players[coupTargetId].name}, escolha uma carta para perder.`,
           });
         }
         break;
@@ -302,10 +299,8 @@ io.on('connection', (socket) => {
         }
         game.state.playerInTurn = auxPlayerInTurn;
         game.state.dropCardTurn = false;
-        io.emit('updateGame', game.state);
         auxPlayerInTurn = null;
         break;
-      
       case 'assassin':
         const { message: assassinMessage, success, targetId } = gameActionHandler.assassin(player, param);
         message = assassinMessage;
@@ -316,7 +311,7 @@ io.on('connection', (socket) => {
           });
           return;
         } else {
-          // Se o assassinato foi bem-sucedido, o jogador alvo deve descartar uma carta
+          auxPlayerInTurn = game.state.playerInTurn;
           game.state.dropCardTurn = true;
           game.state.playerInTurn = targetId;
           io.emit('updateGame', game.state);
