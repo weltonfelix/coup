@@ -92,6 +92,9 @@ socket.on('connect', () => {
     '/matar': (target) => {
     socket.emit('gameAction', { action: 'assassin', param: target });
     },
+    '/condessa': () => {
+      socket.emit('gameAction', { action: 'condessa' });
+    },
   };
 
   formElement.addEventListener('submit', (event) => {

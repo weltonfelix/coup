@@ -65,30 +65,53 @@ export class GameActionHandler {
           success: false,
         };
       }
-  
+    
       if (player.coins < 3) {
         return {
           message: 'Você não tem moedas suficientes para realizar um assassinato.',
           success: false,
         };
       }
-  
+    
       if (!this.game.isPlayerInGame(targetPlayer.id)) {
         return {
           message: 'O jogador alvo não está mais no jogo.',
           success: false,
         };
       }
-  
-      // O jogador paga 3 moedas para realizar o assassinato
+    
       player.coins -= 3;
-  
-      // O jogador alvo deve descartar uma carta
+    
       return {
-        message: `${player.name} tentou assassinar ${target}. ${target} deve descartar uma carta.`,
+        message: `${player.name} tentou assassinar ${target}. ${target} pode se defender com a Condessa (/condessa) ou descartar uma carta (/coupdrop).`,
         success: true,
         targetId: targetPlayer.id,
       };
     }
 
+    condessa(player) {
+      const targetPlayer = this.game.getPlayerByName(player.name);
+      if (!targetPlayer) {
+        return {
+          message: 'Jogador alvo não encontrado.',
+          success: false,
+        };
+      }
+    
+      const hasCondessa = this.game.playerCards[targetPlayer.id].some(
+        (card) => card.name === 'Condessa'
+      );
+    
+      if (hasCondessa) {
+        return {
+          message: `${player.name} se defendeu com a Condessa e bloqueou o assassinato.`,
+          success: true,
+        };
+      } else {
+        return {
+          message: `${player.name} tentou se defender com a Condessa, mas não a possuía e perdeu uma carta.`,
+          success: false,
+        };
+      }
+    }
 }

@@ -37,6 +37,7 @@ export class Deck {
       this.cards.push(new Card('Duque'));
       this.cards.push(new Card('Capitão'));
       this.cards.push(new Card('Assassino'));
+      this.cards.push(new Card('Condessa'));
     }
     console.log(this.cards);
   }

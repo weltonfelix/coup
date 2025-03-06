@@ -289,39 +289,65 @@ io.on('connection', (socket) => {
           });
         }
         break;
-      case 'coupDrop':
-        message = gameActionHandler.coup(player, param);
-        if (!message) {
-          return sendMessageToAll({
-            player: { name: 'JOGO' },
-            message: `Carta inválida, ${player.name}. Descarte uma carta.`,
-          });
-        }
-        game.state.playerInTurn = auxPlayerInTurn;
-        game.state.dropCardTurn = false;
-        auxPlayerInTurn = null;
-        break;
-      case 'assassin':
-        const { message: assassinMessage, success, targetId } = gameActionHandler.assassin(player, param);
-        message = assassinMessage;
-        if (!success) {
-          sendMessageToAll({
-            player: { name: 'JOGO' },
-            message,
-          });
-          return;
-        } else {
-          auxPlayerInTurn = game.state.playerInTurn;
-          game.state.dropCardTurn = true;
-          game.state.playerInTurn = targetId;
+        case 'coupDrop':
+          message = gameActionHandler.coup(player, param);
+          if (!message) {
+            return sendMessageToAll({
+              player: { name: 'JOGO' },
+              message: `Carta inválida, ${player.name}. Descarte uma carta.`,
+            });
+          }
+          game.state.playerInTurn = auxPlayerInTurn;
+          game.state.dropCardTurn = false;
+          auxPlayerInTurn = null; 
           io.emit('updateGame', game.state);
           sendMessageToAll({
             player: { name: 'JOGO' },
-            message: `${player.name} tentou assassinar ${param}! ${param} deve descartar uma carta.`,
+            message: `${player.name} descartou uma carta. O turno volta para ${game.state.players[game.state.playerInTurn].name}.`,
           });
-          return;
-        }
-        break;  
+          break;
+          case 'assassin':
+            const { message: assassinMessage, success, targetId } = gameActionHandler.assassin(player, param);
+            message = assassinMessage;
+            if (!success) {
+              sendMessageToAll({
+                player: { name: 'JOGO' },
+                message,
+              });
+              return;
+            } else {
+              auxPlayerInTurn = game.state.playerInTurn;
+              game.state.playerInTurn = targetId;
+              game.state.dropCardTurn = true;
+              io.emit('updateGame', game.state);
+              sendMessageToAll({
+                player: { name: 'JOGO' },
+                message: `${player.name} tentou assassinar ${param}! ${param} deve descartar uma carta ou usar a Condessa.`,
+              });
+              return;
+            }
+            break;
+
+        case 'condessa':
+          const { message: condessaMessage, success: condessaSuccess } = gameActionHandler.condessa(player);
+          message = condessaMessage;
+          if (condessaSuccess) {
+            game.state.dropCardTurn = false;
+            game.state.playerInTurn = auxPlayerInTurn;
+            auxPlayerInTurn = null; 
+            io.emit('updateGame', game.state); 
+            sendMessageToAll({
+              player: { name: 'JOGO' },
+              message: `${player.name} usou a Condessa para bloquear o assassinato! O turno volta para ${game.state.players[game.state.playerInTurn].name}.`,
+            });
+          } else {
+            game.state.dropCardTurn = true; 
+            sendMessageToAll({
+              player: { name: 'JOGO' },
+              message: `${player.name} não tem a Condessa e deve descartar uma carta.`,
+            });
+          }
+          break;
 
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);
