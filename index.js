@@ -271,26 +271,75 @@ io.on('connection', (socket) => {
           proceed: proceedSteal,
           targetId: stealTargetId,
         } = gameActionHandler.stealAttempt(player, param);
+      
         if (!proceedSteal) {
           return sendMessageToAll({
             player: { name: 'JOGO' },
-            stealMessage,
+            message: stealMessage, // Corrigido
           });
         }
+      
+        if (!stealTargetId || !game.state.players[stealTargetId]) {
+          return sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `Jogador inválido para roubo. Tente novamente, ${player.name}.`,
+          });
+        }
+      
         console.log(stealMessage, stealTargetId, proceedSteal);
-
+      
         auxPlayerInTurn = game.state.playerInTurn;
         game.state.playerInTurn = stealTargetId;
         game.state.turnType = TurnTypes.STEAL;
         io.emit('updateGame', game.state);
+      
         sendMessageToAll({
           player: { name: 'JOGO' },
-          stealMessage,
+          message: `${player.name} tentou roubar ${game.state.players[stealTargetId].name}! ${game.state.players[stealTargetId].name}, você aceita ou bloqueia?`,
         });
+      
         return;
-      case 'accept_steal':
-        message = gameActionHandler.accept_steal(player);
-        break;
+        
+        case 'accept_steal':
+          if (game.state.turnType !== TurnTypes.STEAL) {
+            return sendMessageToAll({
+              player: { name: 'JOGO' },
+              message: 'Não há roubo para aceitar neste momento!',
+            });
+          }
+        
+          const thief = game.state.players[auxPlayerInTurn]; // Jogador que tentou roubar (deveria ser 'a')
+          const victim = game.state.players[game.state.playerInTurn]; // Jogador que foi roubado (deveria ser 'b')
+        
+          if (!thief || !victim) {
+            return sendMessageToAll({
+              player: { name: 'JOGO' },
+              message: 'Erro ao processar roubo. Jogadores inválidos!',
+            });
+          }
+        
+          // Determina a quantidade de moedas roubadas
+          const stolenAmount = Math.min(victim.coins, 2); // O ladrão pode roubar no máximo 2 moedas ou tudo o que a vítima tiver
+        
+          // Atualiza as moedas dos jogadores
+          victim.coins -= stolenAmount;
+          thief.coins += stolenAmount;
+        
+          // Reseta o turno para o ladrão (quem tentou roubar)
+          game.state.playerInTurn = auxPlayerInTurn;
+          game.state.turnType = TurnTypes.REGULAR;
+          auxPlayerInTurn = null;
+          io.emit('updateGame', game.state);
+        
+          sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `${thief.name} roubou ${stolenAmount} moedas de ${victim.name}.`,
+          });
+        
+          nextTurn(); // Agora o turno volta corretamente para 'a'
+          return;
+        
+        
       case 'tax':
         message = gameActionHandler.tax(player);
         break;
