@@ -16,14 +16,33 @@ export class GameActionHandler {
     return `${player.name} pediu ajuda externa (2 moedas).`;
   }
 
-  steal(player, target) {
-    const amount = this.game.steal(
-      player.id,
-      this.game.getPlayerByName(target).id
+  stealAttempt(player, target) {
+    const targetPlayer = this.game.getPlayerByName(target);
+    const result = this.game.stealAttempt(player.id, targetPlayer.id);
+
+    if (result) {
+      return {
+        message: `${player.name} está tentando roubar ${targetPlayer.name}.`,
+        proceed: true,
+        targetId: targetPlayer.id,
+      };
+    } else {
+      return {
+        message: result.failMessage,
+        proceed: false,
+        targetId: targetPlayer.id,
+      };
+    }
+  }
+
+  accept_steal(player) {
+    const target = this.game.state.players[this.game.state.steal.targetPlayerId];
+    const amount = this.game.accept_steal(
+      player.id
     );
     return `${player.name} roubou ${amount} moeda${
       amount !== 1 ? 's' : ''
-    } de ${target}.`;
+    } de ${target.name}.`;
   }
 
   tax(player) {
@@ -89,29 +108,24 @@ export class GameActionHandler {
       };
     }
 
-    condessa(player) {
-      const targetPlayer = this.game.getPlayerByName(player.name);
-      if (!targetPlayer) {
-        return {
-          message: 'Jogador alvo não encontrado.',
-          success: false,
-        };
-      }
-    
-      const hasCondessa = this.game.playerCards[targetPlayer.id].some(
-        (card) => card.name === 'Condessa'
-      );
-    
-      if (hasCondessa) {
-        return {
-          message: `${player.name} se defendeu com a Condessa e bloqueou o assassinato.`,
-          success: true,
-        };
-      } else {
-        return {
-          message: `${player.name} tentou se defender com a Condessa, mas não a possuía e perdeu uma carta.`,
-          success: false,
-        };
+    condessa(player) {    
+      return {
+        message: `${player.name} se defendeu com a Condessa e bloqueou o assassinato.`,
+        success: true,
+      };
+    }
+
+    block(player) {
+      return {
+        message: `${player.name} bloqueou o roubo.`,
+        success: true,
+      };
+    }
+
+    accept(player) {
+      return{
+        message: `${player.name} aceitou o roubo.`,
+        success: true,
       }
     }
 }

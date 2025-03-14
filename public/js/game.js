@@ -73,6 +73,12 @@ export class Deck {
   }
 }
 
+export const TurnTypes = Object.freeze({
+    REGULAR:   Symbol("regular"),
+    DROP_CARD:  Symbol("drop_card"),
+    STEAL: Symbol("steal")
+});
+
 /**
  * Jogo
  * @class
@@ -84,13 +90,19 @@ export class Game {
    * @property {object.<string, Player>} players - Jogadores do jogo
    * @property {boolean} isStarted - Indica se o jogo está iniciado
    * @property {string} playerInTurn - ID do jogador em turno
-   * @property {boolean} dropCardTurn - Indica se é a vez de descartar uma carta
+   * @property {string} turnType - Tipo de turno (regular, dropCard, steal)
    */
   state = {
     players: {},
     isStarted: false,
     playerInTurn: null,
-    dropCardTurn: false,
+    turnType: TurnTypes.REGULAR,
+    steal: false,
+    // {
+    //   //  playerId: null,
+    //   // targetPlayerId: null,
+    //   // amount: 0
+    // }
   };
   /**
    * Baralho do jogo
@@ -118,7 +130,8 @@ export class Game {
       players: {},
       isStarted: false,
       playerInTurn: null,
-      dropCardTurn: false,
+      turnType: TurnTypes.REGULAR,
+      steal: false,
     };
     this.deck = null;
     this.playerCards = {};
@@ -268,7 +281,8 @@ export class Game {
    * @param {string} targetPlayerId - ID do jogador que está sendo roubado
    * @returns {number|boolean} Retorna a quantidade de moedas roubadas, ou `false` se o jogador alvo não está mais no jogo
    */
-  steal(playerId, targetPlayerId) {
+  accept_steal(playerId) {
+    const targetPlayerId = this.state.steal.targetPlayerId;
     if (playerId === targetPlayerId) return false;
     if (!this.#isAlive(targetPlayerId)) return false;
     const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2);
@@ -278,7 +292,28 @@ export class Game {
     this.state.players[targetPlayerId].coins =
       this.state.players[targetPlayerId].coins - amountStealed;
 
+    this.state.turnType = TurnTypes.STEAL;
+    this.state.playerInTurn = targetPlayerId; 
+
+    this.state.steal = false;
+
     return amountStealed;
+  }
+
+  stealAttempt(playerId, targetPlayerId) {
+    if (playerId === targetPlayerId) return false;
+    if (!this.#isAlive(targetPlayerId)) return false;
+    const amount = Math.min(this.state.players[targetPlayerId].coins, 2);
+
+    this.state.turnType = TurnTypes.STEAL;
+    this.state.playerInTurn = targetPlayerId; 
+    this.state.steal = {
+      playerId,
+      targetPlayerId,
+      amount,
+    };
+
+    return true;
   }
 
   /**
@@ -301,8 +336,6 @@ export class Game {
     }
 
     this.state.players[playerId].coins -= 3;
-
-    this.state.dropCardTurn = true;
     this.state.playerInTurn = targetPlayerId; 
     
 
@@ -385,7 +418,7 @@ export class Game {
     this.coupedCards = [];
     this.state.players = {};
     this.state.playerInTurn = null;
-    this.state.dropCardTurn = false;
+    this.state.turnType = TurnTypes.REGULAR;
   }
 
   /**

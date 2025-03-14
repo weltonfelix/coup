@@ -73,6 +73,9 @@ socket.on('connect', () => {
     '/roubar': (target) => {
       socket.emit('gameAction', { action: 'steal', param: target });
     },
+    '/aceitar-roubo': () => {
+      socket.emit('gameAction', { action: 'accept_steal'});
+    },
     '/imposto': () => {
       socket.emit('gameAction', { action: 'tax' });
     },
@@ -94,6 +97,12 @@ socket.on('connect', () => {
     },
     '/condessa': () => {
       socket.emit('gameAction', { action: 'condessa' });
+    },
+    '/bloqueio': () => {
+      socket.emit('gameAction', { action: 'block' });
+    },
+    '/aceitar': () => {
+      socket.emit('gameAction', { action: 'accept' });
     },
   };
 
@@ -148,6 +157,7 @@ socket.on('connect', () => {
     if (player.id === myPlayerId) {
       return;
     }
+    console.log(`${player}: ${message}`);
     messageRenderer.renderReceivedMessage(player, message);
   });
 
