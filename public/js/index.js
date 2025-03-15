@@ -7,6 +7,7 @@ const messagesElement = document.getElementById('messages');
 
 const messageRenderer = new Renderer(messagesElement);
 const game = new Game();
+const renderer = new Renderer();
 
 let playerName = window.prompt('Qual o seu nome?');
 while (!playerName) {
@@ -146,10 +147,18 @@ socket.on('connect', () => {
   console.log(`${playerName} connected: ${myPlayerId}`);
   socket.on('messageReceived', ({ player, message }) => {
     if (player.id === myPlayerId) {
-      return;
+        return;
     }
+    
     messageRenderer.renderReceivedMessage(player, message);
-  });
+    console.log(message);
+
+    // Verifica se a mensagem envolve pegar moedas e dispara a animação
+    if (message.includes("renda") || message.includes("ajuda externa") || message.includes("imposto")) {
+      console.log('moeda');
+      renderer.showCoinAnimation();
+    }
+});
 
   socket.on('updateGame', (state) => {
     game.updateGame(state);
