@@ -1,4 +1,4 @@
-import { Game } from './game.js';
+import { Game, TurnTypes } from './game.js';
 import { Renderer } from './renderer.js';
 
 const formElement = document.getElementById('form');
@@ -75,7 +75,7 @@ socket.on('connect', () => {
       socket.emit('gameAction', { action: 'steal', param: target });
     },
     '/aceitar-roubo': () => {
-      socket.emit('gameAction', { action: 'accept_steal'});
+      socket.emit('gameAction', { action: 'accept_steal' });
     },
     '/imposto': () => {
       socket.emit('gameAction', { action: 'tax' });
@@ -84,7 +84,11 @@ socket.on('connect', () => {
       socket.emit('gameAction', { action: 'coup', param: target });
     },
     '/coupdrop': (cardName) => {
-      if (!myCards.find((card) => card.name.toLowerCase() === cardName.toLowerCase())) {
+      if (
+        !myCards.find(
+          (card) => card.name.toLowerCase() === cardName.toLowerCase()
+        )
+      ) {
         return renderSecretMessage('Você não tem essa carta.');
       }
       socket.emit('gameAction', { action: 'coupDrop', param: cardName });
@@ -94,10 +98,24 @@ socket.on('connect', () => {
       );
     },
     '/matar': (target) => {
-    socket.emit('gameAction', { action: 'assassin', param: target });
+      socket.emit('gameAction', { action: 'assassin', param: target });
     },
     '/condessa': () => {
       socket.emit('gameAction', { action: 'condessa' });
+    },
+    '/assassinodrop': (cardName) => {
+      if (
+        !myCards.find(
+          (card) => card.name.toLowerCase() === cardName.toLowerCase()
+        )
+      ) {
+        return renderSecretMessage('Você não tem essa carta.');
+      }
+      socket.emit('gameAction', { action: 'assassinDrop', param: cardName });
+      myCards.splice(
+        myCards.findIndex((card) => card.name === cardName),
+        1
+      );
     },
     '/bloqueio': () => {
       socket.emit('gameAction', { action: 'block_steal' });
@@ -131,7 +149,11 @@ socket.on('connect', () => {
           renderSecretMessage(`O jogo ainda não começou.`);
         }
       } else if (inTurnAction) {
-        if (game.state.playerInTurn !== myPlayerId) {
+        const isRegularTurn = game.state.turnType === TurnTypes.REGULAR;
+        if (
+          (!isRegularTurn && myPlayerId !== game.state.playerTempInTurn) ||
+          (isRegularTurn && myPlayerId !== game.state.playerInTurn)
+        ) {
           return renderSecretMessage(`Não é a sua vez.`);
         }
         if (game.state.isStarted) {
@@ -156,18 +178,22 @@ socket.on('connect', () => {
   console.log(`${playerName} connected: ${myPlayerId}`);
   socket.on('messageReceived', ({ player, message }) => {
     if (player.id === myPlayerId) {
-        return;
+      return;
     }
-    
+
     messageRenderer.renderReceivedMessage(player, message);
     console.log(message);
 
     // Verifica se a mensagem envolve pegar moedas e dispara a animação
-    if (message.includes("renda") || message.includes("ajuda externa") || message.includes("imposto")) {
+    if (
+      message.includes('renda') ||
+      message.includes('ajuda externa') ||
+      message.includes('imposto')
+    ) {
       console.log('moeda');
       renderer.showCoinAnimation();
     }
-});
+  });
 
   socket.on('updateGame', (state) => {
     game.updateGame(state);

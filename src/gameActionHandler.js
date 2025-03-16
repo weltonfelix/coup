@@ -1,4 +1,9 @@
+import { Game } from "../public/js/game.js";
+
 export class GameActionHandler {
+  /**
+   * @type {Game}
+   */
   game;
 
   constructor(game) {
@@ -31,8 +36,8 @@ export class GameActionHandler {
     return `${player.name} pediu imposto (3 moedas).`;
   }
 
-  coupAttempt(player, target) {
-    const result = this.game.coupAttempt(
+  coup(player, target) {
+    const result = this.game.coup(
       player.id,
       this.game.getPlayerByName(target)?.id
     );
@@ -46,72 +51,33 @@ export class GameActionHandler {
       return {
         message: result.failMessage,
         proceed: false,
-        targetId: this.game.getPlayerByName(target).id,
+        targetId: this.game.getPlayerByName(target)?.id,
       };
     }
   }
-  
-    coup(player, cardName) {
-      const card = this.game.coup(player.id, cardName);
-      if (!card) return false;
-      return `${player.name} descartou ${card.name} por um golpe.`;
-    }
 
-    assassin(player, target) {
-      const targetPlayer = this.game.getPlayerByName(target);
-      if (!targetPlayer) {
-        return {
-          message: 'Jogador alvo não encontrado.',
-          success: false,
-        };
-      }
-    
-      if (player.coins < 3) {
-        return {
-          message: 'Você não tem moedas suficientes para realizar um assassinato.',
-          success: false,
-        };
-      }
-    
-      if (!this.game.isPlayerInGame(targetPlayer.id)) {
-        return {
-          message: 'O jogador alvo não está mais no jogo.',
-          success: false,
-        };
-      }
-    
-      player.coins -= 3;
-    
+  coupDrop(player, cardName) {
+    return this.game.coupCardDrop(player.id, cardName);
+  }
+
+  assassin(player, target) {
+    const targetPlayer = this.game.getPlayerByName(target);
+    if (!targetPlayer) {
       return {
-        message: `${player.name} tentou assassinar ${target}. ${target} pode se defender com a Condessa (/condessa) ou descartar uma carta (/coupdrop).`,
-        success: true,
-        targetId: targetPlayer.id,
+        message: 'Jogador alvo não encontrado.',
+        success: false,
       };
     }
 
-    condessa(player) {
-      const targetPlayer = this.game.getPlayerByName(player.name);
-      if (!targetPlayer) {
-        return {
-          message: 'Jogador alvo não encontrado.',
-          success: false,
-        };
-      }
-    
-      const hasCondessa = this.game.playerCards[targetPlayer.id].some(
-        (card) => card.name === 'Condessa'
-      );
-    
-      if (hasCondessa) {
-        return {
-          message: `${player.name} se defendeu com a Condessa e bloqueou o assassinato.`,
-          success: true,
-        };
-      } else {
-        return {
-          message: `${player.name} tentou se defender com a Condessa, mas não a possuía e perdeu uma carta.`,
-          success: false,
-        };
-      }
-    }
+    return this.game.assassinAttempt(player.id, targetPlayer.id);
+  }
+
+  contessa(player) {
+    this.game.defenseAttempt(player.id);
+    return this.game.defense();
+  }
+
+  assassinDrop(player, cardName) {
+    return this.game.assassinCardDrop(player.id, cardName);
+  }
 }
