@@ -73,6 +73,12 @@ export class Deck {
   }
 }
 
+export const TurnTypes = Object.freeze({
+    REGULAR:   Symbol("regular"),
+    DROP_CARD:  Symbol("drop_card"),
+    STEAL: Symbol("steal")
+});
+
 /**
  * Jogo
  * @class
@@ -84,13 +90,19 @@ export class Game {
    * @property {object.<string, Player>} players - Jogadores do jogo
    * @property {boolean} isStarted - Indica se o jogo está iniciado
    * @property {string} playerInTurn - ID do jogador em turno
-   * @property {boolean} dropCardTurn - Indica se é a vez de descartar uma carta
+   * @property {string} turnType - Tipo de turno (regular, dropCard, steal)
    */
   state = {
     players: {},
     isStarted: false,
     playerInTurn: null,
-    dropCardTurn: false,
+    turnType: TurnTypes.REGULAR,
+    steal: false,
+    // {
+    //   //  playerId: null,
+    //   // targetPlayerId: null,
+    //   // amount: 0
+    // }
   };
   /**
    * Baralho do jogo
@@ -118,7 +130,8 @@ export class Game {
       players: {},
       isStarted: false,
       playerInTurn: null,
-      dropCardTurn: false,
+      turnType: TurnTypes.REGULAR,
+      steal: false,
     };
     this.deck = null;
     this.playerCards = {};
@@ -263,23 +276,73 @@ export class Game {
   }
 
   /**
-   * Tenta aceitar suborno de um jogador. Isto é, roubar 2 moedas de um jogador.
+   * Tenta aceitar o roubo de moedas de um jogador. Ou seja, o jogador aceita perder moedas.
    * @param {string} playerId - ID do jogador que está tentando roubar
-   * @param {string} targetPlayerId - ID do jogador que está sendo roubado
    * @returns {number|boolean} Retorna a quantidade de moedas roubadas, ou `false` se o jogador alvo não está mais no jogo
    */
-  steal(playerId, targetPlayerId) {
-    if (playerId === targetPlayerId) return false;
-    if (!this.#isAlive(targetPlayerId)) return false;
-    const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2);
+  accept_steal(playerId) {
+    const targetPlayerId = this.state.steal.targetPlayerId;
+    
+    if (playerId === targetPlayerId) return false;  // Não pode roubar a si mesmo
+    if (!this.#isAlive(targetPlayerId)) return false;  // Verifica se a vítima ainda está no jogo
 
-    this.state.players[playerId].coins =
-      this.state.players[playerId].coins + amountStealed;
-    this.state.players[targetPlayerId].coins =
-      this.state.players[targetPlayerId].coins - amountStealed;
+    const amountStealed = Math.min(this.state.players[targetPlayerId].coins, 2);  // Rouba no máximo 2 moedas
 
-    return amountStealed;
+    this.state.players[playerId].coins += amountStealed;  // O jogador que roubou recebe as moedas
+    this.state.players[targetPlayerId].coins -= amountStealed;  // A vítima perde as moedas
+
+    this.state.turnType = TurnTypes.REGULAR;  // O turno volta a ser normal após o roubo
+    this.state.playerInTurn = playerId;  // O turno volta para quem roubou
+
+    this.state.steal = false;  // O roubo é concluído
+
+    return amountStealed;  // Retorna a quantidade de moedas roubadas
   }
+
+  /**
+   * Tenta bloquear um roubo. Ou seja, impede que o roubo aconteça e o turno não é alterado.
+   * @param {string} playerId - ID do jogador que está bloqueando o roubo
+   * @returns {boolean} Retorna `true` se o bloqueio for bem-sucedido, ou `false` se não houver um roubo ativo
+   */
+  block_steal(playerId) {
+    const targetPlayerId = this.state.steal.targetPlayerId;
+
+    if (!this.state.steal || !this.#isAlive(targetPlayerId)) return false;  // Verifica se há um roubo ativo e se a vítima está viva
+
+    // Impede que o roubo aconteça, mas não altera as moedas
+    this.state.steal = false;  // O roubo é cancelado
+
+    // Não altera o turno - quem estava tentando roubar mantém o turno
+    this.state.turnType = TurnTypes.REGULAR;
+    this.state.playerInTurn = this.state.steal.playerId;
+
+    return true;  // Bloqueio bem-sucedido
+  }
+
+  /**
+   * Tentativa de roubo. Este método prepara o roubo de moedas de um jogador.
+   * @param {string} playerId - ID do jogador que está tentando roubar
+   * @param {string} targetPlayerId - ID do jogador que está sendo roubado
+   * @returns {boolean} Retorna `true` se o roubo foi iniciado com sucesso, ou `false` se não for possível
+   */
+  stealAttempt(playerId, targetPlayerId) {
+    if (playerId === targetPlayerId) return false;  // Não pode roubar a si mesmo
+    if (!this.#isAlive(targetPlayerId)) return false;  // Verifica se a vítima está viva
+
+    const amount = Math.min(this.state.players[targetPlayerId].coins, 2);  // Define o valor do roubo
+
+    this.state.turnType = TurnTypes.STEAL;  // O turno agora é de roubo
+    this.state.playerInTurn = playerId;  // O turno vai para a vítima, pois ela tem a chance de bloquear ou aceitar
+
+    this.state.steal = {
+      playerId,
+      targetPlayerId,
+      amount,
+    };
+
+    return true;  // Roubo iniciado com sucesso
+  }
+
 
   /**
    * Realiza um assassinato. O jogador paga 3 moedas e o alvo deve descartar uma carta.
@@ -301,8 +364,6 @@ export class Game {
     }
 
     this.state.players[playerId].coins -= 3;
-
-    this.state.dropCardTurn = true;
     this.state.playerInTurn = targetPlayerId; 
     
 
@@ -385,7 +446,7 @@ export class Game {
     this.coupedCards = [];
     this.state.players = {};
     this.state.playerInTurn = null;
-    this.state.dropCardTurn = false;
+    this.state.turnType = TurnTypes.REGULAR;
   }
 
   /**
