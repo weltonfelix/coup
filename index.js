@@ -250,13 +250,14 @@ io.on('connection', (socket) => {
     }
 
     if (game.state.turnType === TurnTypes.STEAL) {
-      if (action !== 'accept_steal') {
+      if (action !== 'accept_steal' && action !== 'block_steal') {
         return socket.emit('messageReceived', {
           player: { name: 'JOGO' },
           message: `Você precisa aceitar ou bloquear o roubo, ${player.name}.`,
         });
       }
     }
+    
 
     switch (action) {
       case 'income':
@@ -271,6 +272,9 @@ io.on('connection', (socket) => {
           proceed: proceedSteal,
           targetId: stealTargetId,
         } = gameActionHandler.stealAttempt(player, param);
+        console.log('Antes do roubo');
+        console.log('Player in turn:', game.state.playerInTurn);
+        console.log('auxPlayerInTurn:', auxPlayerInTurn);
       
         if (!proceedSteal) {
           return sendMessageToAll({
@@ -286,21 +290,30 @@ io.on('connection', (socket) => {
           });
         }
       
-        console.log(stealMessage, stealTargetId, proceedSteal);
+        
       
         auxPlayerInTurn = game.state.playerInTurn;
         game.state.playerInTurn = stealTargetId;
         game.state.turnType = TurnTypes.STEAL;
+        console.log('Player in turn:', game.state.playerInTurn);
+        console.log('auxPlayerInTurn:', auxPlayerInTurn);
+
         io.emit('updateGame', game.state);
       
         sendMessageToAll({
           player: { name: 'JOGO' },
-          message: `${player.name} tentou roubar ${game.state.players[stealTargetId].name}! ${game.state.players[stealTargetId].name}, você aceita ou bloqueia?`,
+          message: `${player.name} tentou roubar ${param}! ${param}, você aceita ou bloqueia?`,
         });
       
         return;
         
         case 'accept_steal':
+          const {
+            message: acceptStealMessage,
+            success: acceptStealSuccess,
+          } = gameActionHandler.accept_steal(player);
+          message = acceptStealMessage;
+
           if (game.state.turnType !== TurnTypes.STEAL) {
             return sendMessageToAll({
               player: { name: 'JOGO' },
@@ -338,6 +351,40 @@ io.on('connection', (socket) => {
         
           nextTurn(); // Agora o turno volta corretamente para 'a'
           return;
+
+          case 'block_steal':
+            if (game.state.turnType !== TurnTypes.STEAL) {
+              return sendMessageToAll({
+                player: { name: 'JOGO' },
+                message: 'Não há roubo para bloquear neste momento!',
+              });
+            }
+          
+            const thiefBlocked = game.state.players[auxPlayerInTurn];
+            const victimBlocked = game.state.players[game.state.playerInTurn];
+            console.log(thiefBlocked, victimBlocked);
+          
+            if (!thiefBlocked || !victimBlocked) {
+              return sendMessageToAll({
+                player: { name: 'JOGO' },
+                message: 'Erro ao processar o bloqueio. Jogadores inválidos!',
+              });
+            }
+          
+            // O roubo foi bloqueado, nada acontece com as moedas
+            sendMessageToAll({
+              player: { name: 'JOGO' },
+              message: `Roubo bloqueado! Nenhuma moeda foi transferida.`,
+            });
+          
+            // O turno volta para o jogador que tentou roubar
+            game.state.playerInTurn = auxPlayerInTurn;
+            game.state.turnType = TurnTypes.REGULAR;
+            auxPlayerInTurn = null;
+            io.emit('updateGame', game.state);
+            nextTurn(); // Continua o jogo normalmente
+            return;
+          
         
         
       case 'tax':
@@ -400,6 +447,9 @@ io.on('connection', (socket) => {
           targetId,
         } = gameActionHandler.assassin(player, param);
         message = assassinMessage;
+        console.log('Antes do assassinato');
+        console.log('Player in turn:', game.state.playerInTurn);
+        console.log('auxPlayerInTurn:', auxPlayerInTurn);
         if (!success) {
           sendMessageToAll({
             player: { name: 'JOGO' },

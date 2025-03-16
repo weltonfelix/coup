@@ -7,6 +7,7 @@ const messagesElement = document.getElementById('messages');
 
 const messageRenderer = new Renderer(messagesElement);
 const game = new Game();
+const renderer = new Renderer();
 
 let playerName = window.prompt('Qual o seu nome?');
 while (!playerName) {
@@ -99,7 +100,7 @@ socket.on('connect', () => {
       socket.emit('gameAction', { action: 'condessa' });
     },
     '/bloqueio': () => {
-      socket.emit('gameAction', { action: 'block' });
+      socket.emit('gameAction', { action: 'block_steal' });
     },
     '/aceitar': () => {
       socket.emit('gameAction', { action: 'accept' });
@@ -157,8 +158,13 @@ socket.on('connect', () => {
     if (player.id === myPlayerId) {
       return;
     }
-    console.log(`${player}: ${message}`);
+
     messageRenderer.renderReceivedMessage(player, message);
+    console.log(message);
+    if (message.includes("renda") || message.includes("ajuda externa") || message.includes("imposto")) {
+      console.log('moeda');
+      renderer.showCoinAnimation();
+    }
   });
 
   socket.on('updateGame', (state) => {
