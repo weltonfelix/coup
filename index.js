@@ -123,6 +123,31 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('revealCards', () => {
+    const player = game.state.players[socket.id];
+    if (!player) {
+      return socket.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: 'Você não está no jogo!',
+      });
+    }
+  
+    const playerCards = game.playerCards[player.id];
+    if (!playerCards || playerCards.length === 0) {
+      return socket.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: 'Você não tem cartas para revelar.',
+      });
+    }
+  
+    const cardsMessage = `Cartas de ${player.name}: ${playerCards.map(card => card.name).join(', ')}`;
+    
+    m.sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: cardsMessage,
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${formattedPlayer}`);
     game.removePlayer(player.id);

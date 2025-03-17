@@ -64,6 +64,9 @@ socket.on('connect', () => {
         `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}.`
       );
     },
+    '/revelarcartas': () => {
+      socket.emit('revealCards');
+    },
   };
 
   const inTurnActions = {
