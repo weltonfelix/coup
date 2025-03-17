@@ -9,6 +9,8 @@ const messageRenderer = new Renderer(messagesElement);
 const game = new Game();
 const renderer = new Renderer();
 
+let pendingAction = null;
+
 let playerName = window.prompt('Qual o seu nome?');
 while (!playerName) {
   playerName = window.prompt('Qual o seu nome?');
@@ -68,18 +70,11 @@ socket.on('connect', () => {
     '/renda': () => {
       socket.emit('gameAction', { action: 'income' });
     },
-    '/ajudaexterna': () => {
-      socket.emit('gameAction', { action: 'foreignAid' });
-    },
-    '/roubar': (target) => {
-      socket.emit('gameAction', { action: 'steal', param: target });
-    },
+
     '/aceitar-roubo': () => {
       socket.emit('gameAction', { action: 'accept_steal' });
     },
-    '/imposto': () => {
-      socket.emit('gameAction', { action: 'tax' });
-    },
+
     '/coup': (target) => {
       socket.emit('gameAction', { action: 'coup', param: target });
     },
@@ -97,12 +92,7 @@ socket.on('connect', () => {
         1
       );
     },
-    '/matar': (target) => {
-      socket.emit('gameAction', { action: 'assassin', param: target });
-    },
-    '/condessa': () => {
-      socket.emit('gameAction', { action: 'condessa' });
-    },
+
     '/assassinodrop': (cardName) => {
       if (
         !myCards.find(
@@ -117,13 +107,54 @@ socket.on('connect', () => {
         1
       );
     },
-    '/bloqueio': () => {
-      socket.emit('gameAction', { action: 'block_steal' });
-    },
     '/aceitar': () => {
       socket.emit('gameAction', { action: 'accept' });
     },
+    '/confirmar': () => {
+      if (!pendingAction) {
+        return renderSecretMessage('Nenhuma ação pendente para confirmar.');
+    }
+    
+    const { action, param } = pendingAction;
+    pendingAction = null;
+    
+    socket.emit('gameAction', { action, param });
+  },
+};
+
+const inTurnActionsWithConfirmation = {
+  
+  '/ajudaexterna': () => {
+    pendingAction = { action: 'foreignAid' };
+    renderSecretMessage('Use /confirmar para confirmar a ação de ajuda externa.');
+  },
+  '/roubar': (target) => {
+    pendingAction = { action: 'steal', param: target };
+    renderSecretMessage(`Use /confirmar para confirmar o roubo de ${target}.`);
+  },
+  '/bloqueio': () => {
+    pendingAction = { action: 'block_steal' };
+    renderSecretMessage('Use /confirmar para confirmar o bloqueio.');
+  },
+    '/imposto': () => {
+      pendingAction = { action: 'tax' };
+      renderSecretMessage('Use /confirmar para confirmar a ação de imposto.');
+    },
+    '/matar': (target) => {
+      pendingAction = { action: 'assassin', param: target };
+      renderSecretMessage(`Use /confirmar para confirmar o assassinato de ${target}.`);
+    },
+    '/condessa': () => {
+      pendingAction = { action: 'condessa' };
+      renderSecretMessage('Use /confirmar para confirmar a defesa com a Condessa.');
+    },
+
+    
+    
   };
+  
+  
+  Object.assign(inTurnActions, inTurnActionsWithConfirmation);
 
   formElement.addEventListener('submit', (event) => {
     event.preventDefault();
