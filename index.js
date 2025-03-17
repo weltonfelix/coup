@@ -91,6 +91,21 @@ io.on('connection', (socket) => {
     callback(); // Essa função é chamada para confirmar ao cliente que a mensagem foi recebida
   });
 
+  socket.on('attemptAction', ({ action, param }) => {
+    const player = game.state.players[socket.id];
+    if (!player) return;
+
+    let message = `${player.name} está tentando realizar a ação: ${action}`;
+    if (param) {
+      message += ` em ${param}`;
+    }
+
+    m.sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: message,
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${formattedPlayer}`);
     game.removePlayer(player.id);

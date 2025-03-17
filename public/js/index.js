@@ -123,35 +123,37 @@ socket.on('connect', () => {
 };
 
 const inTurnActionsWithConfirmation = {
-  
   '/ajudaexterna': () => {
     pendingAction = { action: 'foreignAid' };
+    socket.emit('attemptAction', { action: 'ajuda externa' });
     renderSecretMessage('Use /confirmar para confirmar a ação de ajuda externa.');
   },
   '/roubar': (target) => {
     pendingAction = { action: 'steal', param: target };
+    socket.emit('attemptAction', { action: 'roubo', param: target });
     renderSecretMessage(`Use /confirmar para confirmar o roubo de ${target}.`);
   },
   '/bloqueio': () => {
     pendingAction = { action: 'block_steal' };
+    socket.emit('attemptAction', { action: 'bloquear roubo' });
     renderSecretMessage('Use /confirmar para confirmar o bloqueio.');
   },
-    '/imposto': () => {
-      pendingAction = { action: 'tax' };
-      renderSecretMessage('Use /confirmar para confirmar a ação de imposto.');
-    },
-    '/matar': (target) => {
-      pendingAction = { action: 'assassin', param: target };
-      renderSecretMessage(`Use /confirmar para confirmar o assassinato de ${target}.`);
-    },
-    '/condessa': () => {
-      pendingAction = { action: 'condessa' };
-      renderSecretMessage('Use /confirmar para confirmar a defesa com a Condessa.');
-    },
-
-    
-    
-  };
+  '/imposto': () => {
+    pendingAction = { action: 'tax' };
+    socket.emit('attemptAction', { action: 'imposto' });
+    renderSecretMessage('Use /confirmar para confirmar a ação de imposto.');
+  },
+  '/matar': (target) => {
+    pendingAction = { action: 'assassin', param: target };
+    socket.emit('attemptAction', { action: 'matar', param: target });
+    renderSecretMessage(`Use /confirmar para confirmar o assassinato de ${target}.`);
+  },
+  '/condessa': () => {
+    pendingAction = { action: 'condessa' };
+    socket.emit('attemptAction', { action: 'condessa' });
+    renderSecretMessage('Use /confirmar para confirmar a defesa com a Condessa.');
+  },
+};
   
   
   Object.assign(inTurnActions, inTurnActionsWithConfirmation);
