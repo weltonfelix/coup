@@ -148,6 +148,34 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('swapCards', () => {
+    if (!g.checkPlayerInGame()) return; // Verifica se o jogador está no jogo
+  
+    // Troca as cartas do jogador
+    game.swapCards(player.id);
+  
+    // Obtém as novas cartas do jogador
+    const newCards = game.playerCards[player.id];
+  
+    // Atualiza o estado do jogo para todos os jogadores
+    io.emit('updateGame', game.state);
+  
+    // Envia uma mensagem para todos os jogadores
+    m.sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: `${player.name} trocou suas cartas.`,
+    });
+  
+    // Envia as novas cartas de volta para o jogador que solicitou a troca
+    socket.emit('cardsUpdated', { cards: newCards });
+  
+    // Envia uma mensagem secreta para o jogador com suas novas cartas
+    socket.emit('messageReceived', {
+      player: { name: 'JOGO (secreto)' },
+      message: `Suas novas cartas: ${newCards.map(card => card.name).join(', ')}`,
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${formattedPlayer}`);
     game.removePlayer(player.id);

@@ -298,6 +298,20 @@ export class Game {
     }
   }
 
+  swapCards(playerId) {
+    if (!this.#isAlive(playerId)) return;
+
+    // Devolve as cartas atuais do jogador ao baralho
+    const currentCards = this.playerCards[playerId];
+    currentCards.forEach(card => this.deck.add(card));
+
+    // Embaralha o baralho
+    this.deck.shuffle();
+
+    // Distribui novas cartas ao jogador
+    this.playerCards[playerId] = [this.deck.draw(), this.deck.draw()];
+  }
+
   /**
    * Passa o turno para um jogador temporariamente, para que ele possa realizar uma ação.
    * @param {string} playerId - ID do jogador

@@ -80,4 +80,9 @@ export class GameActionHandler {
   assassinDrop(player, cardName) {
     return this.game.assassinCardDrop(player.id, cardName);
   }
+
+  swapCards(player) {
+    this.game.swapCards(player.id);
+    return `${player.name} trocou suas cartas.`;
+  }
 }

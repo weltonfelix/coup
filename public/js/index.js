@@ -47,6 +47,11 @@ socket.on('connect', () => {
   const myPlayerId = socket.id;
   let myCards = [];
 
+  socket.on('cardsUpdated', ({ cards }) => {
+    myCards = cards; // Atualiza as cartas do jogador
+    console.log('Cartas atualizadas:', myCards);
+  });
+
   const playerActions = {
     '/moedas': () => {
       const players = game.state.players;
@@ -66,6 +71,17 @@ socket.on('connect', () => {
     },
     '/revelarcartas': () => {
       socket.emit('revealCards');
+    },
+    '/trocarcartas': () => {
+      socket.emit('swapCards'); // Emite um evento específico para trocar cartas
+      renderSecretMessage('Você solicitou a troca de cartas.'); // Feedback para o jogador
+    },
+    '/desconfiar': (target) => {
+      if (!target) {
+        return renderSecretMessage('Você precisa especificar o jogador que desconfia.');
+      }
+      socket.emit('doubtAction', { target });
+      renderSecretMessage(`Você desconfiou de ${target}.`);
     },
   };
 
@@ -122,13 +138,6 @@ socket.on('connect', () => {
     pendingAction = null;
     
     socket.emit('gameAction', { action, param });
-  },
-  '/desconfiar': (target) => {
-    if (!target) {
-      return renderSecretMessage('Você precisa especificar o jogador que desconfia.');
-    }
-    socket.emit('doubtAction', { target });
-    renderSecretMessage(`Você desconfiou de ${target}.`);
   },
 };
 
