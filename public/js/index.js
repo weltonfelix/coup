@@ -120,6 +120,13 @@ socket.on('connect', () => {
     
     socket.emit('gameAction', { action, param });
   },
+  '/desconfiar': (target) => {
+    if (!target) {
+      return renderSecretMessage('Você precisa especificar o jogador que desconfia.');
+    }
+    socket.emit('doubtAction', { target });
+    renderSecretMessage(`Você desconfiou de ${target}.`);
+  },
 };
 
 const inTurnActionsWithConfirmation = {
@@ -175,6 +182,14 @@ const inTurnActionsWithConfirmation = {
       // Esse parâmetro é opcional, então pode ser undefined. Ele pode ser um jogador alvo, ou o nome de uma carta (no caso de coupDrop)
       const playerAction = playerActions[command];
       const inTurnAction = inTurnActions[command];
+      if (command === '/desconfiar') {
+        const inTurnAction = inTurnActions[command];
+        if (inTurnAction) {
+          inTurnAction(param);
+        }
+        inputElement.value = '';
+        return;
+      }
       if (playerAction) {
         if (game.state.isStarted) {
           playerAction(param);

@@ -106,6 +106,23 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('doubtAction', ({ target }) => {
+    const player = game.state.players[socket.id];
+    const targetPlayer = game.getPlayerByName(target);
+
+    if (!player || !targetPlayer) {
+      return socket.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: 'Jogador alvo não encontrado.',
+      });
+    }
+
+    m.sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: `${player.name} desconfiou de ${targetPlayer.name}!`,
+    });
+  });
+
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${formattedPlayer}`);
     game.removePlayer(player.id);
