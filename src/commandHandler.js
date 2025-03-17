@@ -7,7 +7,7 @@ export class CommandHandler {
   startGame(sockets) {
     this.game.startGame();
     this.#distributeCards(sockets);
-    
+
     const playerInTurn = this.game.state.playerInTurn;
     return this.#getPlayersOrder(playerInTurn);
   }
@@ -31,10 +31,8 @@ export class CommandHandler {
 
   #getPlayersOrder(playerInTurn) {
     const playersOrder = [playerInTurn];
-    this.game.nextTurn(); // Skip the player in turn
     while (this.game.state.playerInTurn !== playerInTurn) {
       playersOrder.push(this.game.state.playerInTurn);
-      this.game.nextTurn();
     }
 
     return playersOrder.map(

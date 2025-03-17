@@ -1,4 +1,4 @@
-import { Game, TurnTypes } from './game.js';
+import { Game } from './game.js';
 import { Renderer } from './renderer.js';
 
 const formElement = document.getElementById('form');
@@ -65,25 +65,13 @@ socket.on('connect', () => {
   };
 
   const inTurnActions = {
-    '/renda': () => {
-      socket.emit('gameAction', { action: 'income' });
+    '/pegar': (amount) => {
+      socket.emit('gameAction', { action: 'drawCoins', param: amount });
     },
-    '/ajudaexterna': () => {
-      socket.emit('gameAction', { action: 'foreignAid' });
+    '/pagar': (amount) => {
+      socket.emit('gameAction', { action: 'payCoins', param: amount });
     },
-    '/roubar': (target) => {
-      socket.emit('gameAction', { action: 'steal', param: target });
-    },
-    '/aceitar-roubo': () => {
-      socket.emit('gameAction', { action: 'accept_steal' });
-    },
-    '/imposto': () => {
-      socket.emit('gameAction', { action: 'tax' });
-    },
-    '/coup': (target) => {
-      socket.emit('gameAction', { action: 'coup', param: target });
-    },
-    '/coupdrop': (cardName) => {
+    '/drop': (cardName) => {
       if (
         !myCards.find(
           (card) => card.name.toLowerCase() === cardName.toLowerCase()
@@ -91,19 +79,13 @@ socket.on('connect', () => {
       ) {
         return renderSecretMessage('Você não tem essa carta.');
       }
-      socket.emit('gameAction', { action: 'coupDrop', param: cardName });
+      socket.emit('gameAction', { action: 'dropCard', param: cardName });
       myCards.splice(
         myCards.findIndex((card) => card.name === cardName),
         1
       );
     },
-    '/matar': (target) => {
-      socket.emit('gameAction', { action: 'assassin', param: target });
-    },
-    '/condessa': () => {
-      socket.emit('gameAction', { action: 'condessa' });
-    },
-    '/assassinodrop': (cardName) => {
+    '/trocar': (cardName) => {
       if (
         !myCards.find(
           (card) => card.name.toLowerCase() === cardName.toLowerCase()
@@ -111,18 +93,9 @@ socket.on('connect', () => {
       ) {
         return renderSecretMessage('Você não tem essa carta.');
       }
-      socket.emit('gameAction', { action: 'assassinDrop', param: cardName });
-      myCards.splice(
-        myCards.findIndex((card) => card.name === cardName),
-        1
-      );
-    },
-    '/bloqueio': () => {
-      socket.emit('gameAction', { action: 'block_steal' });
-    },
-    '/aceitar': () => {
-      socket.emit('gameAction', { action: 'accept' });
-    },
+      socket.emit('gameAction', { action: 'exchangeCard', param: cardName });
+      // Não precisa remover, pois vai receber as duas cartas de volta com um gameStarted
+    }
   };
 
   formElement.addEventListener('submit', (event) => {
@@ -149,13 +122,6 @@ socket.on('connect', () => {
           renderSecretMessage(`O jogo ainda não começou.`);
         }
       } else if (inTurnAction) {
-        const isRegularTurn = game.state.turnType === TurnTypes.REGULAR;
-        if (
-          (!isRegularTurn && myPlayerId !== game.state.playerTempInTurn) ||
-          (isRegularTurn && myPlayerId !== game.state.playerInTurn)
-        ) {
-          return renderSecretMessage(`Não é a sua vez.`);
-        }
         if (game.state.isStarted) {
           inTurnAction(param);
         } else {

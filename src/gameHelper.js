@@ -29,24 +29,9 @@ export class GameHelper {
     this.#game = game;
     this.#player = player;
     this.#formattedPlayer = formattedPlayer;
-    this.#io = io;  
+    this.#io = io;
     this.#socket = socket;
     this.#m = messageHelper;
-  }
-
-  /**
-   * Passa a vez para o próximo jogador e emite um evento para atualizar o jogo
-   * @returns {Player} O jogador que deve jogar a próxima rodada
-   */
-  nextTurn() {
-    const { state } = this.#game;
-    this.#game.nextTurn();
-    this.#io.emit('updateGame', state);
-    this.#m.sendMessageToAll({
-      player: { name: 'JOGO' },
-      message: `É a vez de ${this.#game.state.players[this.#game.state.playerInTurn].name}.`,
-    });
-    return state.players[state.playerInTurn];
   }
 
   checkPlayerInGame() {
@@ -116,6 +101,6 @@ export class GameHelper {
     });
     this.#game.stopGame();
     this.#io.emit('updateGame', this.#game.state);
-    resetGame();
+    this.resetGame();
   }
 }

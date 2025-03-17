@@ -10,74 +10,21 @@ export class GameActionHandler {
     this.game = game;
   }
 
-  income(player) {
-    this.game.income(player.id);
-    console.log(`${player.name} pegou renda (1 moeda).`);
-    return `${player.name} pegou renda (1 moeda).`;
+  drawCoins(player, amountToDraw) {
+    const amount = parseInt(amountToDraw) || 0;
+    return this.game.drawCoins(player.id, amount);
   }
 
-  foreignAid(player) {
-    this.game.foreignAid(player.id);
-    return `${player.name} pediu ajuda externa (2 moedas).`;
+  payCoins(player, amountToPay) {
+    const amount = parseInt(amountToPay) || 0;
+    return this.game.payCoins(player.id, amount);
   }
 
-  steal(player, target) {
-    const amount = this.game.steal(
-      player.id,
-      this.game.getPlayerByName(target).id
-    );
-    return `${player.name} roubou ${amount} moeda${
-      amount !== 1 ? 's' : ''
-    } de ${target}.`;
+  dropCard(player, cardName) {
+    return this.game.dropCard(player.id, cardName);
   }
 
-  tax(player) {
-    this.game.tax(player.id);
-    return `${player.name} pediu imposto (3 moedas).`;
-  }
-
-  coup(player, target) {
-    const result = this.game.coup(
-      player.id,
-      this.game.getPlayerByName(target)?.id
-    );
-    if (result.ok) {
-      return {
-        message: `${player.name} deu um golpe em ${target}.`,
-        proceed: true,
-        targetId: this.game.getPlayerByName(target).id,
-      };
-    } else {
-      return {
-        message: result.failMessage,
-        proceed: false,
-        targetId: this.game.getPlayerByName(target)?.id,
-      };
-    }
-  }
-
-  coupDrop(player, cardName) {
-    return this.game.coupCardDrop(player.id, cardName);
-  }
-
-  assassin(player, target) {
-    const targetPlayer = this.game.getPlayerByName(target);
-    if (!targetPlayer) {
-      return {
-        message: 'Jogador alvo não encontrado.',
-        success: false,
-      };
-    }
-
-    return this.game.assassinAttempt(player.id, targetPlayer.id);
-  }
-
-  contessa(player) {
-    this.game.defenseAttempt(player.id);
-    return this.game.defense();
-  }
-
-  assassinDrop(player, cardName) {
-    return this.game.assassinCardDrop(player.id, cardName);
+  exchangeCard(player, cardName) {
+    return this.game.exchangeCard(player.id, cardName);
   }
 }
