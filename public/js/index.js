@@ -76,17 +76,10 @@ socket.on('connect', () => {
       socket.emit('swapCards'); // Emite um evento específico para trocar cartas
       renderSecretMessage('Você solicitou a troca de cartas.'); // Feedback para o jogador
     },
-    '/desconfiar': (target) => {
-      if (!target) {
-        return renderSecretMessage('Você precisa especificar o jogador que desconfia.');
-      }
-      socket.emit('doubtAction', { target });
-      renderSecretMessage(`Você desconfiou de ${target}.`);
-    },
   };
-
-  const inTurnActions = {
-    '/renda': () => {
+    
+    const inTurnActions = {
+      '/renda': () => {
       socket.emit('gameAction', { action: 'income' });
     },
 
@@ -111,7 +104,7 @@ socket.on('connect', () => {
         1
       );
     },
-
+    
     '/assassinodrop': (cardName) => {
       if (
         !myCards.find(
@@ -132,13 +125,30 @@ socket.on('connect', () => {
     '/confirmar': () => {
       if (!pendingAction) {
         return renderSecretMessage('Nenhuma ação pendente para confirmar.');
-    }
-    
-    const { action, param } = pendingAction;
-    pendingAction = null;
-    
-    socket.emit('gameAction', { action, param });
-  },
+      }
+      
+      const { action, param } = pendingAction;
+      pendingAction = null;
+      
+      socket.emit('gameAction', { action, param });
+    },
+    '/cancelar': () => {
+      if (!pendingAction) {
+        return renderSecretMessage('Nenhuma ação pendente para cancelar.');
+      }
+      
+      pendingAction = null;
+      socket.emit('cancelAction');
+      renderSecretMessage('Ação cancelada. O turno passará para o próximo jogador.');
+    },
+
+    '/desconfiar': (target) => {
+      if (!target) {
+        return renderSecretMessage('Você precisa especificar o jogador que desconfia.');
+      }
+      socket.emit('doubtAction', { target });
+      renderSecretMessage(`Você desconfiou de ${target}.`);
+    },
 };
 
 const inTurnActionsWithConfirmation = {

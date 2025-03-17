@@ -106,6 +106,36 @@ io.on('connection', (socket) => {
     });
   });
 
+  socket.on('cancelAction', () => {
+    const player = game.state.players[socket.id];
+    if (!player) {
+      return socket.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: 'Você não está no jogo!',
+      });
+    }
+  
+    // Verifica se é a vez do jogador
+    const isRegularTurn = game.state.turnType === TurnTypes.REGULAR;
+    if (
+      (!isRegularTurn && player.id !== game.state.playerTempInTurn) ||
+      (isRegularTurn && player.id !== game.state.playerInTurn)
+    ) {
+      return socket.emit('messageReceived', {
+        player: { name: 'JOGO' },
+        message: `Não é a sua vez, ${player.name}.`,
+      });
+    }
+  
+    // Cancela a ação pendente e passa o turno para o próximo jogador
+    m.sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: `${player.name} cancelou a ação. O turno passará para o próximo jogador.`,
+    });
+  
+    g.nextTurn(); // Passa o turno para o próximo jogador
+  });
+
   socket.on('doubtAction', ({ target }) => {
     const player = game.state.players[socket.id];
     const targetPlayer = game.getPlayerByName(target);
