@@ -115,6 +115,7 @@ io.on('connection', (socket) => {
     }
     if (!g.checkPlayerInGame()) return;
     const playersOrderNames = commandHandler.startGame(io.sockets.sockets);
+    console.log(playersOrderNames)
     console.log(`----- GAME STARTED (by ${formattedPlayer}) -----`);
     game.startGame();
     io.emit('updateGame', game.state); // Update game state for all players, since the game has started
@@ -201,6 +202,13 @@ io.on('connection', (socket) => {
         socket.emit('updateCards', {
           cards: game.playerCards[player.id],
         });
+        if (!resultObject.success){
+          socket.emit('messageReceived', {
+            player: { name: 'JOGO' },
+            message: resultObject.message,
+          });
+          return;
+        }
         break;
 
       default:

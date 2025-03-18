@@ -35,8 +35,8 @@ export class CommandHandler {
       playersOrder.push(this.game.state.playerInTurn);
     }
 
-    return playersOrder.map(
-      (playerId) => this.game.state.players[playerId].name
+    return Object.values(this.game.state.players).map(
+      (player) => player.name
     );
   }
 }
