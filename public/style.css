@@ -8,6 +8,8 @@
 body {
   display: flex;
   flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
   font-family: 'Roboto', 'Ubuntu', 'Arial', sans-serif;
 }
 
@@ -43,12 +45,14 @@ input#input {
   padding: 0.5rem;
   border-radius: 0.5rem;
   font-size: 1rem;
+  max-width: 300px;
   position: relative;
 }
 
 #messages li.sent {
   background-color: #a5d3c9;
-  margin-left: 5rem;
+  margin-left: auto;
+  padding-right: 1.7rem;
   border-bottom-right-radius: 0;
 }
 

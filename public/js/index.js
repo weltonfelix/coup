@@ -5,13 +5,16 @@ const formElement = document.getElementById('form');
 const inputElement = document.getElementById('input');
 const messagesElement = document.getElementById('messages');
 
-const messageRenderer = new Renderer(messagesElement);
+const renderer = new Renderer(messagesElement);
 const game = new Game();
-const renderer = new Renderer();
 
 let playerName = window.prompt('Qual o seu nome?');
-while (!playerName) {
-  playerName = window.prompt('Qual o seu nome?');
+if (!playerName) {
+  renderer.renderReceivedMessage(
+    { name: 'JOGO' },
+    'Você precisa de um nome para jogar. Recarregue a página e tente novamente.'
+  );
+  throw new Error('No name provided');
 }
 
 const socket = io({
@@ -21,7 +24,7 @@ const socket = io({
 });
 
 function sendTextMessage(message) {
-  const el = messageRenderer.renderSentMessage(message);
+  const el = renderer.renderSentMessage(message);
   socket.emit('sendMessage', message, () => {
     el.classList.remove('message-loading');
     el.classList.add('message-sent');
@@ -29,7 +32,7 @@ function sendTextMessage(message) {
 }
 
 function renderSecretMessage(message) {
-  messageRenderer.renderReceivedMessage({ name: 'JOGO (secreto)' }, message);
+  renderer.renderReceivedMessage({ name: 'JOGO (secreto)' }, message);
 }
 
 const commands = {
@@ -147,7 +150,7 @@ socket.on('connect', () => {
       return;
     }
 
-    messageRenderer.renderReceivedMessage(player, message);
+    renderer.renderReceivedMessage(player, message);
     console.log(message);
 
     // Verifica se a mensagem envolve pegar moedas e dispara a animação
@@ -171,7 +174,7 @@ socket.on('connect', () => {
   socket.on('gameStarted', ({ cards }) => {
     console.log('Game started');
     myCards = cards;
-    messageRenderer.renderReceivedMessage(
+    renderer.renderReceivedMessage(
       { name: 'JOGO' },
       `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}`
     );
