@@ -31,4 +31,8 @@ export class GameActionHandler {
   exchangeCard(player, cardName) {
     return this.game.exchangeCard(player.id, cardName);
   }
+
+  steal(player, target) {
+    return this.game.steal(player.id, target);
+  }
 }

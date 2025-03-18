@@ -71,6 +71,9 @@ socket.on('connect', () => {
     '/pegar': (amount) => {
       socket.emit('gameAction', { action: 'drawCoins', param: amount });
     },
+    '/roubar': (target) => {
+      socket.emit('gameAction', { action: 'steal', param: target });
+    },
     '/pagar': (amount) => {
       socket.emit('gameAction', { action: 'payCoins', param: amount });
     },

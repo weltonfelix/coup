@@ -182,6 +182,10 @@ io.on('connection', (socket) => {
         resultObject = gameActionHandler.payCoins(player, param);
         break;
 
+      case 'steal':
+        resultObject = gameActionHandler.steal(player, param);
+        break;
+
       case 'exchangeCard':
         resultObject = gameActionHandler.exchangeCard(player, param);
         socket.emit('gameStarted', {

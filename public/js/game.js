@@ -275,6 +275,29 @@ export class Game {
   }
 
   /**
+   * Jogador tenta roubar moedas.
+   * @param string playerId ID do jogador que está roubando
+   * @param string playerId ID do jogador que está sendo roubado
+   * @returns {Card|null} Retorna  a mensagem de roubo
+   */
+  steal(playerId, targetPlayer) {
+    
+    if (!this.#isAlive(this.getPlayerByName(targetPlayer).id)) {
+      return {
+      message: `Insira um jogador alvo válido`,
+      };
+    } else {
+    const amountStealed = Math.min(this.state.players[this.getPlayerByName(targetPlayer).id].coins, 2);
+    const player = this.state.players[playerId];
+    const target = targetPlayer;
+
+    return {
+      message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer}`,
+    };
+  };
+  }
+
+  /**
    * Troca uma carta por outra do baralho, REVELANDO a carta retirada.
    * Usada em casos de "desconfio"
    *
