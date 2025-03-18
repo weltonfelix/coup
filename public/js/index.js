@@ -179,15 +179,15 @@ socket.on('connect', () => {
     renderer.renderReceivedMessage(player, message);
     console.log(message);
 
-    // Verifica se a mensagem envolve pegar moedas e dispara a animação
-    if (
-      message.includes('pegou')
-    ) {
-      renderer.showCoinAnimation();
-    } 
-    
-    if (message.includes('assassinado')) {
-      console.log('assassinado')
+    // Verifica se a mensagem e dispara a animação
+    if (message.includes('Renda')) {
+      console.log('renda')
+      renderer.showCoinAnimation(1);
+    } else if (message.includes('Ajuda Extra')) {
+      renderer.showCoinAnimation(2);
+    } else if (message.includes('Imposto')) {
+      renderer.showCoinAnimation(3);
+    } else if (message.includes('assassinado')) {
       renderer.showMurderAnimation();
     }
 

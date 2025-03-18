@@ -1,7 +1,7 @@
 export class Renderer {
   constructor(containerEl) {
     this.containerEl = containerEl;
-    this.coinAnimation = document.querySelector("#coin-animation");
+    this.coinContainer = document.querySelector("#coin-container");
     this.murderAnimation = document.querySelector("#murder-animation");
   }
 
@@ -45,12 +45,23 @@ export class Renderer {
     return messageEl;
   }
 
-  showCoinAnimation() {
-    if (!this.coinAnimation) return; 
+  showCoinAnimation(numCoins) {
+    if (!this.coinContainer) return; 
 
-    this.coinAnimation.style.display = "block"; 
+    this.coinContainer.innerHTML = "";
+
+    for (let i = 0; i < numCoins; i++) {
+      const coin = document.createElement("img");
+      coin.src = "media/coin.gif"; 
+      coin.alt = "Moeda animada";
+      coin.classList.add("coin"); 
+      this.coinContainer.appendChild(coin);
+    }
+
+    this.coinContainer.style.display = "flex";
+
     setTimeout(() => {
-      this.coinAnimation.style.display = "none"; 
+      this.coinContainer.style.display = "none";
     }, 2000);
   }
 
