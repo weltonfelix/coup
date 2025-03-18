@@ -103,6 +103,10 @@ io.on('connection', (socket) => {
       messages = [];
     }
     socket.broadcast.emit('updateGame', game.state);
+    m.sendMessageToAll({
+      player: { name: 'JOGO' },
+      message: `${player.name} saiu`,
+    });
   });
 
   socket.on('startGame', () => {

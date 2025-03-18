@@ -183,5 +183,14 @@ socket.on('connect', () => {
   socket.on('disconnect', () => {
     console.log(`Player disconnected: ${myPlayerId}`);
     socket.close();
+    renderer.renderReceivedMessage(
+      { name: 'JOGO' },
+      'Você foi desconectado. Recarregue a página para jogar novamente.'
+    )
+    inputElement.disabled = true;
+    const reloadButton = document.createElement('button');
+    reloadButton.textContent = 'Recarregar';
+    reloadButton.onclick = () => window.location.reload();
+    messagesElement.prepend(reloadButton);
   });
 });

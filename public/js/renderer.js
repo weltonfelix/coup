@@ -14,9 +14,18 @@ export class Renderer {
 
   renderReceivedMessage(player, message) {
     const el = this.#createMessageEl(false);
-    if (player.name === "JOGO") {
+    const isGameMessage = player.name === "JOGO";
+    const isGameSecretMessage = player.name === "JOGO (secreto)";
+    if (isGameMessage || isGameSecretMessage) {
       el.classList.remove("received");
       el.classList.add("received-from-game");
+    }
+    if (isGameSecretMessage) {
+      el.innerHTML = `
+        <span class="secret">Mensagem Secreta</span>
+        <p>${message}</p>
+      `;
+    } else if (isGameMessage) {
       el.innerHTML = `
         <p>${message}</p>
       `;

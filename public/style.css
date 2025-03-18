@@ -98,11 +98,16 @@ input#input {
 
 #messages li.received-from-game {
   background-color: #a4a6bb;
-  color: #2b2d30;
-  font-weight: 600;
+  color: #1c1d1f;
   margin: 0 auto;
   text-align: center;
   max-width: 600px;
+}
+
+#messages li.received-from-game span.secret {
+  font-style: italic;
+  font-weight: 600;
+  font-size: 0.8rem;
 }
 
 #coin-animation {
