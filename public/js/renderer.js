@@ -14,8 +14,11 @@ export class Renderer {
 
   renderReceivedMessage(player, message) {
     const el = this.#createMessageEl(false);
+    if (player.name === 'JOGO') {
+      el.classList.remove('received');
+      el.classList.add('received-from-game');
+    }
     el.innerHTML = `
-      <strong>${player.name}</strong>
       <p>${message}</p>
     `;
     this.containerEl.prepend(el);

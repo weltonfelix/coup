@@ -58,7 +58,7 @@ input#input {
   top: 50%;
   right: 0.5rem;
   font-size: 1rem;
-  color: #4caf50; /* Green for visibility */
+  color: #0a0441;
   transform: translateY(-50%);
 }
 
@@ -71,7 +71,7 @@ input#input {
   width: 1rem;
   height: 1rem;
   border: 2px solid #ccc;
-  border-top-color: #3498db; /* Blue accent */
+  border-top-color: #0a0441; /* Blue accent */
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   transform: translateY(-50%);
@@ -92,11 +92,20 @@ input#input {
   border-bottom-left-radius: 0;
 }
 
+#messages li.received-from-game {
+  background-color: #a4a6bb;
+  color: #2b2d30;
+  font-weight: 600;
+  margin: 0 auto;
+  text-align: center;
+  max-width: 600px;
+}
+
 #coin-animation {
-  position: absolute; 
-  top: 50%; 
-  left: 50%; 
-  transform: translate(-50%, -50%); 
-  z-index: 10; 
-  display: none; 
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: none;
 }
