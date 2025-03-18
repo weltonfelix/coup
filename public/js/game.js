@@ -289,7 +289,6 @@ export class Game {
     } else {
     const amountStealed = Math.min(this.state.players[this.getPlayerByName(targetPlayer).id].coins, 2);
     const player = this.state.players[playerId];
-    const target = targetPlayer;
 
     return {
       message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer}`,
@@ -360,10 +359,28 @@ export class Game {
    */
   drawCoins(playerId, amount) {
     this.state.players[playerId].coins += amount;
-    return {
-      message: `${this.state.players[playerId].name} pegou ${amount} moedas`,
-      success: true,
+    if (amount === 1) {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Renda`,
+        success: true,
+      }
+    } else if (amount === 2) {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Ajuda Extra`,
+        success: true,
+      }
+    } else if (amount === 3) {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Imposto (Duque)`,
+        success: true,
+      }
+    } else {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas`,
+        success: true,
+      }
     }
+    
   }
 
   /**
