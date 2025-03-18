@@ -512,6 +512,28 @@ io.on('connection', (socket) => {
         // game.state.turnType = TurnTypes.REGULAR;
         // auxPlayerInTurn = null;
         break;
+      
+      case 'discardCard':
+        message = gameActionHandler.discardCard(player, param);
+        if (message.includes('não tem')) {
+          return socket.emit('messageReceived', {
+            player: { name: 'JOGO' },
+            message: message,
+          });
+        }
+        io.emit('updateGame', game.state);
+        m.sendMessageToAll({
+          player: { name: 'JOGO' },
+          message: message,
+        });
+  
+        if (g.checkLose()) {
+          if (g.checkGameWon()) {
+            g.handleGameWon();
+            return;
+          }
+        }
+        break;
 
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);

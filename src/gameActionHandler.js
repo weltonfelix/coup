@@ -85,4 +85,13 @@ export class GameActionHandler {
     this.game.swapCards(player.id);
     return `${player.name} trocou suas cartas.`;
   }
+
+  discardCard(player, cardName) {
+    const discardedCard = this.game.discardCard(player.id, cardName);
+    if (discardedCard) {
+      return `${player.name} descartou a carta ${discardedCard.name}.`;
+    } else {
+      return `${player.name}, você não tem a carta ${cardName}.`;
+    }
+  }
 }

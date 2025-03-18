@@ -149,6 +149,14 @@ socket.on('connect', () => {
       socket.emit('doubtAction', { target });
       renderSecretMessage(`Você desconfiou de ${target}.`);
     },
+
+    '/descartarcarta': (cardName) => {
+      if (!cardName) {
+        return renderSecretMessage('Você precisa especificar o nome da carta.');
+      }
+      socket.emit('gameAction', { action: 'discardCard', param: cardName });
+      renderSecretMessage(`Você solicitou descartar a carta ${cardName}.`);
+    },
 };
 
 const inTurnActionsWithConfirmation = {

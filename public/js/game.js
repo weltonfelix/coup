@@ -521,4 +521,26 @@ export class Game {
   defense() {
     return this.#contessaActions.defense();
   }
+
+  /**
+   * Descarta uma carta de um jogador.
+   * @param {string} playerId - ID do jogador
+   * @param {string} cardName - Nome da carta a ser descartada
+   * @returns {Card|null} Retorna a carta descartada, ou null se a carta não foi encontrada
+   */
+  discardCard(playerId, cardName) {
+    if (!this.#isAlive(playerId)) return null;
+
+    const index = this.playerCards[playerId].findIndex(
+      (c) => c.name.toLowerCase() === cardName.toLowerCase()
+    );
+
+    if (index !== -1) {
+      const discardedCard = this.playerCards[playerId].splice(index, 1)[0];
+      this.removedCards.push(discardedCard); // Adiciona a carta descartada ao baralho de cartas removidas
+      return discardedCard;
+    } else {
+      return null;
+    }
+  }
 }
