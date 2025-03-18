@@ -20,8 +20,12 @@ export class GameActionHandler {
     return this.game.payCoins(player.id, amount);
   }
 
-  dropCard(player, cardName) {
-    return this.game.dropCard(player.id, cardName);
+  dropCardMurder(player, cardName) {
+    return this.game.dropCardMurder(player.id, cardName);
+  }
+
+  dropCardCoup(player, cardName) {
+    return this.game.dropCardCoup(player.id, cardName);
   }
 
   exchangeCard(player, cardName) {

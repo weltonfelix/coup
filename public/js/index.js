@@ -74,7 +74,7 @@ socket.on('connect', () => {
     '/pagar': (amount) => {
       socket.emit('gameAction', { action: 'payCoins', param: amount });
     },
-    '/drop': (cardName) => {
+    '/dropassassinato': (cardName) => {
       if (
         !myCards.find(
           (card) => card.name.toLowerCase() === cardName.toLowerCase()
@@ -82,7 +82,21 @@ socket.on('connect', () => {
       ) {
         return renderSecretMessage('Você não tem essa carta.');
       }
-      socket.emit('gameAction', { action: 'dropCard', param: cardName });
+      socket.emit('gameAction', { action: 'dropCardMurder', param: cardName });
+      myCards.splice(
+        myCards.findIndex((card) => card.name === cardName),
+        1
+      );
+    },
+    '/dropgolpe': (cardName) => {
+      if (
+        !myCards.find(
+          (card) => card.name.toLowerCase() === cardName.toLowerCase()
+        )
+      ) {
+        return renderSecretMessage('Você não tem essa carta.');
+      }
+      socket.emit('gameAction', { action: 'dropCardCoup', param: cardName });
       myCards.splice(
         myCards.findIndex((card) => card.name === cardName),
         1

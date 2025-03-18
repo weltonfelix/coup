@@ -154,8 +154,18 @@ io.on('connection', (socket) => {
 
     switch (action) {
 
-      case 'dropCard':
-        resultObject = gameActionHandler.dropCard(player, param);
+      case 'dropCardMurder':
+        resultObject = gameActionHandler.dropCardMurder(player, param);
+        if (!resultObject) {
+          return m.sendMessageToAll({
+            player: { name: 'JOGO' },
+            message: `Erro. Tente novamente`,
+          });
+        }
+        break;
+
+      case 'dropCardCoup':
+        resultObject = gameActionHandler.dropCardCoup(player, param);
         if (!resultObject) {
           return m.sendMessageToAll({
             player: { name: 'JOGO' },

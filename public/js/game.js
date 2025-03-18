@@ -219,13 +219,13 @@ export class Game {
   }
 
   /**
-   * Jogador perde uma carta.
+   * Jogador perde uma carta por assassinato
    * @param string playerId ID do jogador que está perdendo a carta
    * @param string cardName Nome da carta que será removida
    * @returns {Card|null} Retorna a carta removida, ou null se a carta
    * não foi encontrada
    */
-  dropCard(playerId, cardName) {
+  dropCardMurder(playerId, cardName) {
     if (!this.#isAlive(playerId)) return null;
     const player = this.state.players[playerId];
     const index = this.playerCards[playerId].findIndex(
@@ -235,7 +235,35 @@ export class Game {
     if (index !== -1) {
       return {
         card: this.playerCards[playerId].splice(index, 1)[0],
-        message: `${player.name} perdeu um ${cardName}`,
+        message: `${player.name} foi assasinado e perdeu um ${cardName}`,
+        success: true,
+      };
+    } else {
+      return {
+        message: `Você não tem essa carta`,
+        success: false,
+      };
+    }
+  }
+
+  /**
+   * Jogador perde uma carta por golpe.
+   * @param string playerId ID do jogador que está perdendo a carta
+   * @param string cardName Nome da carta que será removida
+   * @returns {Card|null} Retorna a carta removida, ou null se a carta
+   * não foi encontrada
+   */
+  dropCardCoup(playerId, cardName) {
+    if (!this.#isAlive(playerId)) return null;
+    const player = this.state.players[playerId];
+    const index = this.playerCards[playerId].findIndex(
+      (c) => c.name.toLowerCase() === cardName.toLowerCase()
+    );
+
+    if (index !== -1) {
+      return {
+        card: this.playerCards[playerId].splice(index, 1)[0],
+        message: `${player.name} levou um golpe e perdeu um ${cardName}`,
         success: true,
       };
     } else {
