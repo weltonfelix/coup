@@ -342,10 +342,11 @@ export class Game {
    * @returns {Object} Resultado da ação
    */
   ambassador(playerId) {
+    const player = this.state.players[playerId];
     const newCards = [this.deck.draw(), this.deck.draw()];
     this.playerCards[playerId].push(...newCards);
     this.deck.shuffle();
-    return { message: 'Você recebeu novas cartas do Embaixador.' };
+    return { message: `${player.name} recebeu novas cartas do Embaixador.` };
   }
 
   /**
