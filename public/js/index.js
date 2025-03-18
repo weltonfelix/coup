@@ -80,8 +80,20 @@ socket.on("connect", () => {
     "/pegar": (amount) => {
       socket.emit("gameAction", { action: "drawCoins", param: amount });
     },
-    "/pagar": (amount) => {
-      socket.emit("gameAction", { action: "payCoins", param: amount });
+    '/renda': () => {
+      socket.emit('gameAction', { action: 'drawCoins', param: 1 });
+    },
+    '/ajudaextra': () => {
+      socket.emit('gameAction', { action: 'drawCoins', param: 2 });
+    },
+    '/duque': () => {
+      socket.emit('gameAction', { action: 'drawCoins', param: 3 });
+    },
+    '/roubar': (target) => {
+      socket.emit('gameAction', { action: 'steal', param: target });
+    },
+    '/pagar': (amount) => {
+      socket.emit('gameAction', { action: 'payCoins', param: amount });
     },
     "/dropassassinato": (cardName) => {
       if (
@@ -215,9 +227,16 @@ socket.on("connect", () => {
     renderer.renderReceivedMessage(player, message);
     console.log(message);
 
-    // Verifica se a mensagem envolve pegar moedas e dispara a animação
-    if (message.includes("pegou")) {
-      renderer.showCoinAnimation();
+    // Verifica se a mensagem e dispara a animação
+    if (message.includes('Renda')) {
+      console.log('renda')
+      renderer.showCoinAnimation(1);
+    } else if (message.includes('Ajuda Extra')) {
+      renderer.showCoinAnimation(2);
+    } else if (message.includes('Imposto')) {
+      renderer.showCoinAnimation(3);
+    } else if (message.includes('assassinado')) {
+      renderer.showMurderAnimation();
     }
 
     if (message.includes("assassinado")) {

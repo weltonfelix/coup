@@ -110,13 +110,20 @@ input#input {
   font-size: 0.8rem;
 }
 
-#coin-animation {
+#coin-container {
   position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
+  display: flex;
+  gap: 20px; /* Espaçamento entre as moedas */
   z-index: 10;
-  display: none;
+  display: none; /* Inicialmente oculto */
+}
+
+.coin {
+  width: 100px;  /* Tamanho da moeda */
+  height: 100px;
 }
 
 #murder-animation {

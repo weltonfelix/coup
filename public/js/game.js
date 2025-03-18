@@ -279,6 +279,28 @@ export class Game {
   }
 
   /**
+   * Jogador tenta roubar moedas.
+   * @param string playerId ID do jogador que está roubando
+   * @param string playerId ID do jogador que está sendo roubado
+   * @returns {Card|null} Retorna  a mensagem de roubo
+   */
+  steal(playerId, targetPlayer) {
+    
+    if (!this.#isAlive(this.getPlayerByName(targetPlayer).id)) {
+      return {
+      message: `Insira um jogador alvo válido`,
+      };
+    } else {
+    const amountStealed = Math.min(this.state.players[this.getPlayerByName(targetPlayer).id].coins, 2);
+    const player = this.state.players[playerId];
+
+    return {
+      message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer}`,
+    };
+  };
+  }
+
+  /**
    * Troca uma carta por outra do baralho, REVELANDO a carta retirada.
    * Usada em casos de "desconfio"
    *
@@ -379,10 +401,28 @@ export class Game {
    */
   drawCoins(playerId, amount) {
     this.state.players[playerId].coins += amount;
-    return {
-      message: `${this.state.players[playerId].name} pegou ${amount} moedas`,
-      success: true,
+    if (amount === 1) {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Renda`,
+        success: true,
+      }
+    } else if (amount === 2) {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Ajuda Extra`,
+        success: true,
+      }
+    } else if (amount === 3) {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Imposto (Duque)`,
+        success: true,
+      }
+    } else {
+      return {
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas`,
+        success: true,
+      }
     }
+    
   }
 
   /**

@@ -40,4 +40,8 @@ export class GameActionHandler {
     //console.log('returnCards', player, cardNames);
     return this.game.returnCards(player.id, cards);
   }
+  
+  steal(player, target) {
+    return this.game.steal(player.id, target);
+  }
 }
