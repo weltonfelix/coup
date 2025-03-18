@@ -513,27 +513,31 @@ io.on('connection', (socket) => {
         // auxPlayerInTurn = null;
         break;
       
-      case 'discardCard':
-        message = gameActionHandler.discardCard(player, param);
-        if (message.includes('não tem')) {
-          return socket.emit('messageReceived', {
+        case 'discardCard':
+          message = gameActionHandler.discardCard(player, param);
+          if (message.includes('não tem')) {
+            return socket.emit('messageReceived', {
+              player: { name: 'JOGO' },
+              message: message,
+            });
+          }
+    
+          // Emitir as cartas atualizadas para o jogador
+          socket.emit('cardsUpdated', { cards: game.playerCards[player.id] });
+    
+          io.emit('updateGame', game.state);
+          m.sendMessageToAll({
             player: { name: 'JOGO' },
             message: message,
           });
-        }
-        io.emit('updateGame', game.state);
-        m.sendMessageToAll({
-          player: { name: 'JOGO' },
-          message: message,
-        });
-  
-        if (g.checkLose()) {
-          if (g.checkGameWon()) {
-            g.handleGameWon();
-            return;
+    
+          if (g.checkLose()) {
+            if (g.checkGameWon()) {
+              g.handleGameWon();
+              return;
+            }
           }
-        }
-        break;
+          break;
 
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);

@@ -300,16 +300,22 @@ export class Game {
 
   swapCards(playerId) {
     if (!this.#isAlive(playerId)) return;
-
-    // Devolve as cartas atuais do jogador ao baralho
+  
+    // Verifica quantas cartas o jogador tem atualmente
     const currentCards = this.playerCards[playerId];
+    const numberOfCards = currentCards.length;
+  
+    // Devolve as cartas atuais do jogador ao baralho
     currentCards.forEach(card => this.deck.add(card));
-
+  
     // Embaralha o baralho
     this.deck.shuffle();
-
-    // Distribui novas cartas ao jogador
-    this.playerCards[playerId] = [this.deck.draw(), this.deck.draw()];
+  
+    // Distribui novas cartas ao jogador, mantendo a mesma quantidade que ele tinha antes
+    this.playerCards[playerId] = [];
+    for (let i = 0; i < numberOfCards; i++) {
+      this.playerCards[playerId].push(this.deck.draw());
+    }
   }
 
   /**
