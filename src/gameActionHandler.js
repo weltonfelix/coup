@@ -31,4 +31,13 @@ export class GameActionHandler {
   exchangeCard(player, cardName) {
     return this.game.exchangeCard(player.id, cardName);
   }
+
+  ambassador(player) {
+    return this.game.ambassador(player.id);
+  }
+
+  returnCards(player, cards) {
+    //console.log('returnCards', player, cardNames);
+    return this.game.returnCards(player.id, cards);
+  }
 }

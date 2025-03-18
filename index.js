@@ -184,9 +184,23 @@ io.on('connection', (socket) => {
 
       case 'exchangeCard':
         resultObject = gameActionHandler.exchangeCard(player, param);
-        socket.emit('gameStarted', {
+        socket.emit('updateCards', {
           cards: game.playerCards[player.id],
         })
+        break;
+
+      case 'ambassador':
+        resultObject = gameActionHandler.ambassador(player);
+        socket.emit('updateCards', {
+          cards: game.playerCards[player.id],
+        });
+        break;
+    
+      case 'returnCards':
+        resultObject = gameActionHandler.returnCards(player, param);
+        socket.emit('updateCards', {
+          cards: game.playerCards[player.id],
+        });
         break;
 
       default:

@@ -23,7 +23,7 @@ export class CommandHandler {
         console.error(`Player ${playerId} not found`);
         continue;
       }
-      playerSocket.emit('gameStarted', {
+      playerSocket.emit('updateCards', {
         cards: this.game.playerCards[playerId],
       });
     }
