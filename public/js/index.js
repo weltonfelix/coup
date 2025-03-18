@@ -97,7 +97,24 @@ socket.on('connect', () => {
         return renderSecretMessage('Você não tem essa carta.');
       }
       socket.emit('gameAction', { action: 'exchangeCard', param: cardName });
-      // Não precisa remover, pois vai receber as duas cartas de volta com um gameStarted
+      // Não precisa remover, pois vai receber as duas cartas de volta com um updateCards
+    },
+    '/embaixador': () => {
+      socket.emit('gameAction', { action: 'ambassador'});
+    },
+    '/devolver': (cartas) => {
+      const cartas2 = cartas.map((carta) => carta.replaceAll(',', ''));
+      const myCardsNames = [...myCards];
+      for (const carta of cartas2) {
+        if (
+          !myCardsNames.splice(
+            myCards.findIndex((card) => card.name.toLowerCase() === carta.toLowerCase()),
+            1)
+        ) {
+          return renderSecretMessage(`Você não tem a carta ${carta}.`);
+        }
+      }
+      socket.emit('gameAction', { action: 'returnCards', param: cartas2 });
     }
   };
 
@@ -114,7 +131,7 @@ socket.on('connect', () => {
           'Você não está no jogo! Espere o próximo jogo começar.'
         );
       }
-      const [command, param] = message.trim().split(' '); // Remove os espaços extra e divide por " "
+      const [command, ...param] = message.trim().split(' '); // Remove os espaços extra e divide por " "
       // Esse parâmetro é opcional, então pode ser undefined. Ele pode ser um jogador alvo, ou o nome de uma carta (no caso de coupDrop)
       const playerAction = playerActions[command];
       const inTurnAction = inTurnActions[command];
@@ -171,7 +188,7 @@ socket.on('connect', () => {
     }
   });
 
-  socket.on('gameStarted', ({ cards }) => {
+  socket.on('updateCards', ({ cards }) => {
     console.log('Game started');
     myCards = cards;
     renderer.renderReceivedMessage(

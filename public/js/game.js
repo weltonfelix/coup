@@ -38,6 +38,7 @@ export class Deck {
       this.cards.push(new Card('Capitão'));
       this.cards.push(new Card('Assassino'));
       this.cards.push(new Card('Condessa'));
+      this.cards.push(new Card('Embaixador'));
     }
     console.log(this.cards);
   }
@@ -71,6 +72,9 @@ export class Deck {
   add(card) {
     this.cards.push(card);
   }
+
+
+  
 }
 
 /**
@@ -277,6 +281,44 @@ export class Game {
         success: false,
       };
     }
+  }
+
+  /**
+   * Embaixador: Permite ao jogador trocar cartas
+   * @param {string} playerId - ID do jogador
+   * @returns {Object} Resultado da ação
+   */
+  ambassador(playerId) {
+    const newCards = [this.deck.draw(), this.deck.draw()];
+    this.playerCards[playerId].push(...newCards);
+    this.deck.shuffle();
+    return { message: 'Você recebeu novas cartas do Embaixador.' };
+  }
+
+  /**
+   * Devolve cartas ao baralho
+   * @param {string} playerId - ID do jogador
+   * @param {Array<string>} cardNames - Nomes das cartas a serem devolvidas
+   * @returns {Object} Resultado da ação
+   */
+  returnCards(playerId, cardNames) {
+    // colocar dps pra conferir se tem as cartas q ta tentando devolver msm
+    const player = this.state.players[playerId];
+    for (const cardName of cardNames) {
+      const cardIndex = this.playerCards[playerId].findIndex(card => card.name === cardName);
+      if (cardIndex !== -1) {
+        const [card] = this.playerCards[playerId].splice(cardIndex, 1);
+        this.deck.add(card);
+      }
+      else {
+        return {
+          message: `Você não tem a carta ${cardName}`,
+          success: false
+        };
+      }
+    }
+    this.deck.shuffle();
+    return { message: 'Você devolveu as cartas ao baralho.' };
   }
 
   /**
