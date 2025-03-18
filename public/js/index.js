@@ -62,7 +62,7 @@ socket.on('connect', () => {
     },
     '/cartas': () => {
       renderSecretMessage(
-        `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}.`
+        `Suas cartas: <br/> ${myCards.map((card) => card.name).join('<br/>')}.`
       );
     },
   };
@@ -210,7 +210,7 @@ socket.on('connect', () => {
     myCards = cards;
     renderer.renderReceivedMessage(
       { name: 'JOGO' },
-      `Suas cartas: ${myCards.map((card) => card.name).join(' e ')}`
+      `Suas cartas: <br/> ${myCards.map((card) => card.name).join('<br/>')}`
     );
   });
 
