@@ -152,7 +152,7 @@ export class Game {
     // Initial 2 coins and 2 cards for each player
     for (const playerId of Object.keys(this.state.players)) {
       this.#drawInitialPlayerCards(playerId);
-      this.state.players[playerId].coins = 8; // FIXME: voltar pra 2
+      this.state.players[playerId].coins = 2; 
     }
 
     //randomize first player
