@@ -74,7 +74,7 @@ export class Deck {
   }
 
 
-  
+
 }
 
 /**
@@ -156,7 +156,7 @@ export class Game {
     // Initial 2 coins and 2 cards for each player
     for (const playerId of Object.keys(this.state.players)) {
       this.#drawInitialPlayerCards(playerId);
-      this.state.players[playerId].coins = 2; 
+      this.state.players[playerId].coins = 2;
     }
 
     //randomize first player
@@ -317,10 +317,11 @@ export class Game {
    * @returns {Object} Resultado da ação
    */
   ambassador(playerId) {
+    const player = this.state.players[playerId];
     const newCards = [this.deck.draw(), this.deck.draw()];
     this.playerCards[playerId].push(...newCards);
     this.deck.shuffle();
-    return { message: 'Você recebeu novas cartas do Embaixador.' };
+    return { message: `${player.name} recebeu novas cartas do Embaixador.` };
   }
 
   /**
