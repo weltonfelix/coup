@@ -74,7 +74,7 @@ export class Deck {
   }
 
 
-  
+
 }
 
 /**
@@ -156,7 +156,7 @@ export class Game {
     // Initial 2 coins and 2 cards for each player
     for (const playerId of Object.keys(this.state.players)) {
       this.#drawInitialPlayerCards(playerId);
-      this.state.players[playerId].coins = 2; 
+      this.state.players[playerId].coins = 2;
     }
 
     //randomize first player
@@ -216,6 +216,9 @@ export class Game {
    * @returns {Player|null} Retorna o jogador, ou `null` se não encontrado
    */
   getPlayerByName(name) {
+    if (typeof name !== 'string') {
+      return null;
+    }
     for (const [_id, player] of Object.entries(this.state.players)) {
       if (player.name.toLowerCase() === name.toLowerCase()) return player;
     }
@@ -285,7 +288,7 @@ export class Game {
    * @returns {Card|null} Retorna  a mensagem de roubo
    */
   steal(playerId, targetPlayer) {
-    
+
     if (!this.#isAlive(this.getPlayerByName(targetPlayer).id)) {
       return {
       message: `Insira um jogador alvo válido`,
@@ -422,7 +425,7 @@ export class Game {
         success: true,
       }
     }
-    
+
   }
 
   /**
