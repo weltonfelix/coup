@@ -235,7 +235,7 @@ export class Game {
     if (index !== -1) {
       return {
         card: this.playerCards[playerId].splice(index, 1)[0],
-        message: `${player.name} foi assasinado e perdeu um ${cardName}`,
+        message: `${player.name} foi assassinado e perdeu um ${cardName}`,
         success: true,
       };
     } else {

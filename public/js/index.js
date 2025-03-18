@@ -171,9 +171,14 @@ socket.on('connect', () => {
     if (
       message.includes('pegou')
     ) {
-      console.log('moeda');
       renderer.showCoinAnimation();
+    } 
+    
+    if (message.includes('assassinado')) {
+      console.log('assassinado')
+      renderer.showMurderAnimation();
     }
+
   });
 
   socket.on('updateGame', (state) => {

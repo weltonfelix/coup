@@ -2,6 +2,7 @@ export class Renderer {
   constructor(containerEl) {
     this.containerEl = containerEl;
     this.coinAnimation = document.querySelector("#coin-animation");
+    this.murderAnimation = document.querySelector("#murder-animation");
   }
 
   renderSentMessage(message) {
@@ -45,11 +46,20 @@ export class Renderer {
   }
 
   showCoinAnimation() {
-    if (!this.coinAnimation) return; // Evita erro caso o elemento não exista
+    if (!this.coinAnimation) return; 
 
-    this.coinAnimation.style.display = "block"; // Torna o GIF visível
+    this.coinAnimation.style.display = "block"; 
     setTimeout(() => {
-      this.coinAnimation.style.display = "none"; // Esconde o GIF após 2 segundos
+      this.coinAnimation.style.display = "none"; 
+    }, 2000);
+  }
+
+  showMurderAnimation() {
+    if (!this.murderAnimation) return; 
+
+    this.murderAnimation.style.display = "block"; 
+    setTimeout(() => {
+      this.murderAnimation.style.display = "none"; 
     }, 2000);
   }
 }
