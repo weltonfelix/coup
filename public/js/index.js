@@ -155,9 +155,7 @@ socket.on('connect', () => {
 
     // Verifica se a mensagem envolve pegar moedas e dispara a animação
     if (
-      message.includes('renda') ||
-      message.includes('ajuda externa') ||
-      message.includes('imposto')
+      message.includes('pegou')
     ) {
       console.log('moeda');
       renderer.showCoinAnimation();
