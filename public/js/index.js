@@ -3,6 +3,7 @@ import { Renderer } from "./renderer.js";
 
 const formElement = document.getElementById("form");
 const inputElement = document.getElementById("input");
+const submitButtonElement = document.getElementById("submit-button");
 const messagesElement = document.getElementById("messages");
 
 const renderer = new Renderer(messagesElement);
@@ -172,6 +173,10 @@ socket.on("connect", () => {
       }
     }
   });
+  submitButtonElement.addEventListener("click", () => {
+    formElement.dispatchEvent(new Event("submit"));
+    inputElement.focus();
+  } )
 
   formElement.addEventListener("submit", (event) => {
     event.preventDefault();
