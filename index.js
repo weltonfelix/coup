@@ -96,11 +96,10 @@ io.on('connection', (socket) => {
     game.removePlayer(player.id);
     if (
       Object.keys(game.state.players).filter((playerId) =>
-        g.checkPlayerInGame(playerId)
+        game.isPlayerInGame(playerId)
       ).length === 0
     ) {
       game.stopGame();
-      messages = [];
     }
     socket.broadcast.emit('updateGame', game.state);
     m.sendMessageToAll({
@@ -200,7 +199,7 @@ io.on('connection', (socket) => {
           cards: game.playerCards[player.id],
         });
         break;
-    
+
       case 'returnCards':
         resultObject = gameActionHandler.returnCards(player, param);
         socket.emit('updateCards', {

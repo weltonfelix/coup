@@ -288,8 +288,7 @@ export class Game {
    * @returns {Card|null} Retorna  a mensagem de roubo
    */
   steal(playerId, targetPlayer) {
-
-    if (!this.#isAlive(this.getPlayerByName(targetPlayer).id)) {
+    if (!this.#isAlive(this.getPlayerByName(targetPlayer)?.id)) {
       return {
       message: `Insira um jogador alvo válido`,
       };
