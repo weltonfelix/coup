@@ -193,25 +193,29 @@ io.on('connection', (socket) => {
         })
         break;
 
-      case 'ambassador':
-        resultObject = gameActionHandler.ambassador(player);
-        socket.emit('updateCards', {
-          cards: game.playerCards[player.id],
-        });
-        break;
+        case 'ambassador':
+          resultObject = gameActionHandler.ambassador(player);
+          socket.emit('updateCards', {
+            cards: game.playerCards[player.id],
+          });
+          break;
 
       case 'returnCards':
         resultObject = gameActionHandler.returnCards(player, param);
         socket.emit('updateCards', {
           cards: game.playerCards[player.id],
         });
-        if (!resultObject.success){
-          socket.emit('messageReceived', {
-            player: { name: 'JOGO' },
-            message: resultObject.message,
-          });
-          return;
-        }
+
+        socket.emit('messageReceived', {
+          player: { name: 'JOGO' },
+          message: `${player.name} devolveu 2 cartas ao baralho.`,
+        });
+
+
+        socket.broadcast.emit('messageReceived', {
+          player: { name: 'JOGO' },
+          message: `${player.name} devolveu 2 cartas ao baralho.`,
+        });
         break;
 
       default:
@@ -223,10 +227,11 @@ io.on('connection', (socket) => {
     }
 
     console.log(`Player ${formattedPlayer} performed action: ${action}`);
+    if (action != 'returnCards') {
     m.sendMessageToAll({
       player: { name: 'JOGO' },
       message: resultObject.message,
-    });
+    });}
 
     if (g.checkLose()) {
       if (g.checkGameWon()) {
