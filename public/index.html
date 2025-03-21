@@ -13,12 +13,65 @@
   <div id="coin-container"></div>
   <img id="murder-animation" src="media/murder.gif" alt="Animação Assassino" style="width: 300px; height: 300px; display: none;">
 
+  <button id="popup-button" class="popup-button">
+    <img src="media/question-mark.png" alt="Help" width="24" height="24" class="question-icon">
+  </button>
+
+  <div id="popup-container" class="popup-container">
+    <div class="popup-content">
+      <div class="popup-header">
+        <h3>Comandos</h3>
+        <button id="close-popup" class="close-popup">&times;</button>
+      </div>
+      <div class="popup-body">
+        <h4>Controle da Partida</h4>
+        <p><strong>/iniciar</strong>: Inicia a partida</p>
+        <p><strong>/parar</strong>: Para a partida</p>
+        <h4>Ações de turno</h4>
+        <p><strong>/renda</strong>: Pega 1 moeda</p>
+        <p><strong>/ajudaextra</strong>: Pega 2 moedas</p>
+        <p><strong>/duque</strong>: Pega 3 moedas</p>
+        <p><strong>/roubar {jogador alvo}</strong>: Rouba 2 moedas de um jogador alvo</p>
+        <p><strong>/pagar {x}</strong>: Paga uma quantidade x de moedas</p>
+        <p><strong>/dropassassinato {nome carta}</strong>: Escolhe uma carta para perder após ser assassinado pelo Assassino</p>
+        <p><strong>/dropgolpe {nome carta}</strong>: Escolhe uma carta para perder após levar um golpe de estado</p>
+        <p><strong>/embaixador</strong>: Pega 2 novas cartas do deck</p>
+        <p><strong>/trocar {nome carta}</strong>: Troca uma carta sua por outra aleatória do baralho</p>
+        <p><strong>/devolver {nome carta}</strong>: Devolve uma carta sua para o baralho</p>
+      </div>
+    </div>
+  </div>
+
+  <div id="overlay" class="overlay"></div>
+
+  <div id="images-container" class="images-container">
+    <button id="close-images" class="close-images-button">&times;</button>
+  </div>
+
+  <div id="coins-container" class="coins-popup">
+    <div class="coins-title">Moedas dos Jogadores</div>
+    <div id="coins-list" class="coins-list"></div>
+  </div>
+  
   <ul id="messages">
   </ul>
   <form id="form">
     <input autofocus type="text" id="input" autocomplete="off">
     <button type="submit" id="submit-button">Enviar</button>
   </form>
+
+  <div class="bottom-button-1">
+    <button class="popup-button bottom-button-cards">
+      <img src="media/cards.png" alt="Cartas" width="34" height="34" class="cards-icon">
+    </button>
+  </div>
+
+  <div class="bottom-button-2">
+    <button class="popup-button bottom-button-coins">
+      <img src="media/coins.png" alt="Moedas" width="34" height="34" class="coins-icon">
+    </button>
+  </div>
+
   <script src="js/index.js" type="module"></script>
 </body>
 

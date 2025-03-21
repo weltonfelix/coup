@@ -6,6 +6,16 @@ const inputElement = document.getElementById("input");
 const submitButtonElement = document.getElementById("submit-button");
 const messagesElement = document.getElementById("messages");
 
+// Selecionar os elementos dos botões e pop-ups
+const popupButton = document.getElementById("popup-button");
+const popupContainer = document.getElementById("popup-container");
+const closePopup = document.getElementById("close-popup");
+
+const cardsButton = document.querySelector(".bottom-button-1 .bottom-button-cards");
+const coinsButton = document.querySelector(".bottom-button-2 .bottom-button-coins");
+
+const overlay = document.getElementById("overlay");
+
 const renderer = new Renderer(messagesElement);
 const game = new Game();
 
@@ -38,11 +48,75 @@ function sendTextMessage(message) {
   socket.emit("sendMessage", message, () => {
     el.classList.remove("message-loading");
     el.classList.add("message-sent");
-  }); // Essa função é chamada quando o servidor confirma o recebimento da mensagem
+  });
 }
 
 function renderSecretMessage(message) {
   renderer.renderReceivedMessage({ name: "JOGO (secreto)" }, message);
+}
+
+// Aplicar o efeito de tilt nas imagens
+function applyTiltEffect(images) {
+  images.forEach((image) => {
+    image.addEventListener("mousemove", (event) => {
+      const rect = image.getBoundingClientRect();
+      
+      const mouseX = (event.clientX - rect.left) / (rect.right - rect.left);
+      const mouseY = (event.clientY - rect.top) / (rect.bottom - rect.top);
+
+      const tiltX = (mouseY - 0.7) * 20;
+      const tiltY = (mouseX - 0.7) * -20;
+
+      image.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+      image.style.boxShadow = `${tiltY * 2}px ${tiltX * 2}px 20px rgba(0, 0, 0, 0.3)`;
+    });
+
+    image.addEventListener("mouseleave", () => {
+      image.style.transform = "perspective(1000px) rotateX(0) rotateY(0)";
+      image.style.boxShadow = "0 10px 20px rgba(0, 0, 0, 0.2)";
+      
+      image.style.transition = "transform 0.5s ease, box-shadow 0.5s ease";
+      
+      setTimeout(() => {
+        image.style.transition = "";
+      }, 500);
+    });
+    
+    image.style.transformStyle = "preserve-3d";
+    image.style.willChange = "transform";
+  });
+}
+
+function showPlayerCoins(players) {
+  const coinsList = document.getElementById("coins-list");
+  coinsList.innerHTML = "";
+
+  for (const playerId in players) {
+    const player = players[playerId];
+    const coinItem = document.createElement("div");
+    coinItem.className = "coin-item";
+
+    const playerName = document.createElement("span");
+    playerName.className = "player-name";
+    if (playerId === socket.id) {
+      playerName.textContent = `${player.name}(Você)`;
+    } else {
+      playerName.textContent = player.name;
+    }
+
+    const coinAmount = document.createElement("span");
+    coinAmount.className = "coin-amount";
+    coinAmount.textContent = `${player.coins} moedas💲`;
+
+    coinItem.appendChild(playerName);
+    coinItem.appendChild(coinAmount);
+
+    coinsList.appendChild(coinItem);
+  }
+
+  const coinsContainer = document.getElementById("coins-container");
+  coinsContainer.classList.add("show");
+  overlay.classList.add("show");
 }
 
 const commands = {
@@ -57,6 +131,69 @@ const commands = {
 socket.on("connect", () => {
   const myPlayerId = socket.id;
   let myCards = [];
+
+  popupButton.addEventListener("click", () => {
+    popupContainer.classList.add("show");
+  });
+
+  closePopup.addEventListener("click", () => {
+    popupContainer.classList.remove("show");
+  });
+
+  window.addEventListener("click", (event) => {
+    if (event.target === popupContainer) {
+      popupContainer.classList.remove("show");
+    }
+  });
+
+  cardsButton.addEventListener("click", () => {
+    const imagesContainer = document.getElementById("images-container");
+    imagesContainer.innerHTML = "";
+  
+    const title = document.createElement("div");
+    title.className = "images-title";
+    if (myCards && myCards.length > 0) {
+      title.textContent = "Suas Cartas";
+    } else {
+      title.textContent = "Você não possui cartas.";
+    }
+    imagesContainer.appendChild(title);
+  
+    myCards.forEach((card) => {
+      const img = document.createElement("img");
+      img.src = `media/cards/${card.name.toLowerCase()}.png`;
+      img.alt = card.name;
+      img.className = "displayed-image tilt-image";
+      imagesContainer.appendChild(img);
+    });
+    
+    imagesContainer.classList.add("show");
+    overlay.classList.add("show");
+
+    window.addEventListener("click", (event) => {
+      if (event.target === overlay || event.target === imagesContainer) {
+        imagesContainer.classList.remove("show");
+        overlay.classList.remove("show");
+      }
+    });
+
+    const tiltImages = document.querySelectorAll(".tilt-image");
+    applyTiltEffect(tiltImages);
+  });
+
+  coinsButton.addEventListener("click", () => {
+    const players = game.state.players;
+    const coinsContainer = document.getElementById("coins-container");
+    showPlayerCoins(players);
+
+    window.addEventListener("click", (event) => {
+      if (event.target === overlay || event.target === coinsContainer) {
+        coinsContainer.classList.remove("show");
+        overlay.classList.remove("show");
+      }
+    });
+  });
+  
 
   const playerActions = {
     "/moedas": () => {
