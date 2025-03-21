@@ -354,9 +354,15 @@ export class Game {
    * @param {Array<string>} cardNames - Nomes das cartas a serem devolvidas
    * @returns {Object} Resultado da ação
    */
+/**
+ * Devolve cartas ao baralho
+ * @param {string} playerId - ID do jogador
+ * @param {Array<string>} cardNames - Nomes das cartas a serem devolvidas
+ * @returns {Object} Resultado da ação
+ */
   returnCards(playerId, cardNames) {
-    // colocar dps pra conferir se tem as cartas q ta tentando devolver msm
     const player = this.state.players[playerId];
+
     for (const cardName of cardNames) {
       const cardIndex = this.playerCards[playerId].findIndex(card => card.name === cardName);
       if (cardIndex !== -1) {
@@ -370,9 +376,14 @@ export class Game {
         };
       }
     }
+
     this.deck.shuffle();
-    return { message: 'Você devolveu as cartas ao baralho.' };
+
+    return {
+      success: true 
+    };
   }
+
 
   /**
    * Verifica se um jogador está vivo
