@@ -378,9 +378,11 @@ export class Game {
     }
 
     this.deck.shuffle();
+    console.log(`aaa`);
 
     return {
-      success: true 
+      success: true ,
+      message: `${player.name} devolveu 2 cartas ao baralho.`,
     };
   }
 
