@@ -30,16 +30,17 @@ export class Card {
 export class Deck {
   cards;
 
-  constructor() {
-    // add 5 cards of each type
+  constructor(numPlayers) {
     this.cards = [];
-    for (let i = 0; i < 5; i++) {
+    const cardsPerType = numPlayers <= 7 ? 4 : 5;
+    for (let i = 0; i < cardsPerType; i++) {
       this.cards.push(new Card('Duque'));
       this.cards.push(new Card('Capitão'));
       this.cards.push(new Card('Assassino'));
       this.cards.push(new Card('Condessa'));
       this.cards.push(new Card('Embaixador'));
     }
+    console.log(`Baralho inicializado com ${cardsPerType} cartas de cada tipo.`);
     console.log(this.cards);
   }
 
@@ -143,6 +144,7 @@ export class Game {
    * Além disso, define um jogador aleatório para começar.
    * @returns {void}
    */
+
   startGame() {
     if (this.state.isStarted) {
       return;
@@ -150,20 +152,20 @@ export class Game {
     this.state.isStarted = true;
 
     console.log('Game started');
-    this.deck = new Deck();
+    const numPlayers = Object.keys(this.state.players).length;
+    this.deck = new Deck(numPlayers); // Passa o número de jogadores aqui
     this.deck.shuffle();
 
-    // Initial 2 coins and 2 cards for each player
     for (const playerId of Object.keys(this.state.players)) {
       this.#drawInitialPlayerCards(playerId);
       this.state.players[playerId].coins = 2;
     }
 
-    //randomize first player
     this.state.playerInTurn = Object.keys(this.state.players)[
       Math.floor(Math.random() * Object.keys(this.state.players).length)
     ];
   }
+  
 
   /**
    * Finaliza o jogo. Limpa o baralho e as cartas dos jogadores.
