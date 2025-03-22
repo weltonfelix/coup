@@ -175,7 +175,7 @@ input#input {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 99;
+  z-index: 1000;
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
@@ -263,23 +263,23 @@ input#input {
 }
 
 .bottom-button-1 {
-  position: fixed;
-  bottom: 4.5rem;
-  right: 5rem;
+  position: absolute;
+  top: 3rem;
+  right: 0rem;
   z-index: 100;
 }
 
 .bottom-button-2 {
-  position: fixed;
-  bottom: 4.5rem;
-  right: 1rem;
+  position: absolute;
+  top: 6rem;
+  right: 0rem;
   z-index: 100;
 }
 
 .bottom-button-cards,
 .bottom-button-coins {
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
   background-color: #fff;
   border: 1px solid #ccc;
@@ -287,7 +287,7 @@ input#input {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 10px 13px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 0;
 }
 
@@ -304,7 +304,7 @@ input#input {
   height: 100%;
   background-color: rgba(0, 0, 0, 0.5);
   display: none;
-  z-index: 99;
+  z-index: 1000;
 }
 
 .overlay.show {
@@ -331,7 +331,7 @@ input#input {
   display: none;
   gap: 3rem;
   align-items: center;
-  z-index: 100;
+  z-index: 1000;
 }
 
 .images-container.show {
@@ -339,7 +339,8 @@ input#input {
 }
 
 .displayed-image {
-  width: 300px;
+  width: 40vw;
+  max-width: 15rem;
   height: auto;
 }
 
@@ -381,7 +382,7 @@ input#input {
   flex-direction: column;
   align-items: center;
   gap: 1rem;
-  z-index: 100;
+  z-index: 1000;
   background-color: rgba(255, 255, 255, 0.9);
   padding: 1rem;
   border-radius: 0.5rem;
