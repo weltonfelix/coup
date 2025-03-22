@@ -361,29 +361,61 @@ socket.on("connect", () => {
     inputElement.value = "";
   });
 
+const playerColors = {};
+
+function getPlayerColor(playerName) {
+  if (!playerColors[playerName]) {
+    const colors = [
+      'player-name-color-1',
+      'player-name-color-2',
+      'player-name-color-3',
+      'player-name-color-4',
+      'player-name-color-5',
+      'player-name-color-6',
+      'player-name-color-7',
+      'player-name-color-8',
+      'player-name-color-9',
+      'player-name-color-10',
+    ];
+
+    const hash = playerName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+    const index = hash % colors.length;
+    playerColors[playerName] = colors[index];
+  }
+
+  return playerColors[playerName];
+}
+
+
   console.log(`${playerName} connected: ${myPlayerId}`);
   socket.on("messageReceived", ({ player, message }) => {
     if (player.id === myPlayerId) {
       return;
     }
-
-    renderer.renderReceivedMessage(player, message);
+  
+    if (player.name === "JOGO" || player.name === "JOGO (secreto)") {
+      renderer.renderReceivedMessage(player, message);
+    } else {
+      const colorClass = getPlayerColor(player.name);
+      const messageEl = document.createElement("li");
+      messageEl.classList.add("received");
+      messageEl.innerHTML = `
+        <strong class="${colorClass}">${player.name}</strong>
+        <p>${message}</p>
+      `;
+      messagesElement.prepend(messageEl);
+    }
+  
     console.log(message);
-
-    // Verifica se a mensagem e dispara a animação
+  
     if (message.includes('Renda')) {
-      console.log('renda')
+      console.log('renda');
       renderer.showCoinAnimation(1);
     } else if (message.includes('Ajuda Extra')) {
       renderer.showCoinAnimation(2);
     } else if (message.includes('Imposto')) {
       renderer.showCoinAnimation(3);
     } else if (message.includes('assassinado')) {
-      renderer.showMurderAnimation();
-    }
-
-    if (message.includes("assassinado")) {
-      console.log("assassinado");
       renderer.showMurderAnimation();
     }
   });

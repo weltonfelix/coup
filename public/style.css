@@ -91,7 +91,7 @@ input#input {
 }
 
 #messages li.received {
-  background-color: #b6bae5;
+  background-color: #b1b4d1;
   margin-right: 5rem;
   border-bottom-left-radius: 0;
 }
@@ -422,4 +422,44 @@ input#input {
 
 .coin-amount {
   color: #000000;
+}
+
+.player-name-color-1 {
+  color: #ff9500;
+}
+
+.player-name-color-2 {
+  color: #34c759;
+}
+
+.player-name-color-3 {
+  color: #5ac8fa;
+}
+
+.player-name-color-4 {
+  color: #ff3b30; 
+}
+
+.player-name-color-5 {
+  color: #5856d6; 
+}
+
+.player-name-color-6 {
+  color: #ffcc00; 
+}
+
+.player-name-color-7 {
+  color: #007aff; 
+}
+
+.player-name-color-8 {
+  color: #ff2d55; 
+}
+
+.player-name-color-9 {
+  color: #ff9f0a; 
+}
+
+.player-name-color-10 {
+  color: #30d158; 
 }
