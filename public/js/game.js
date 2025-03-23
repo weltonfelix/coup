@@ -193,8 +193,9 @@ export class Game {
    * @param {GameState} gameState - Novo estado do jogo
    * @returns {void}
    */
-  updateGame(gameState) {
-    this.state = gameState;
+  updateGame(state) {
+    this.state = state;
+    this.playerCards = state.playerCards || {};  // Salva as cartas dos jogadores
   }
 
   /**
@@ -443,6 +444,7 @@ export class Game {
    */
   #drawInitialPlayerCards(playerId) {
     this.playerCards[playerId] = [this.deck.draw(), this.deck.draw()];
+
   }
 
   /**

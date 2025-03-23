@@ -171,35 +171,69 @@ socket.on("connect", () => {
 
   cardsButton.addEventListener("click", () => {
     const imagesContainer = document.getElementById("images-container");
-    imagesContainer.innerHTML = "";
-
-    const title = document.createElement("div");
-    title.className = "images-title";
-    if (myCards && myCards.length > 0) {
-      title.textContent = "Suas Cartas";
-    } else {
-      title.textContent = "Você não possui cartas.";
-    }
-    imagesContainer.appendChild(title);
-
+    const myCardsTitle = document.getElementById("my-cards-title");
+    const myCardsDiv = document.getElementById("my-cards");
+    const otherPlayersCardsCountDiv = document.getElementById("other-players-cards-count");
+  
+    myCardsDiv.innerHTML = "";
+    otherPlayersCardsCountDiv.innerHTML = "<h4>Quantidade de Cartas dos Outros Jogadores</h4>";
+    myCardsTitle.textContent = myCards && myCards.length > 0 ? "Suas Cartas" : "Você não possui cartas.";
+    imagesContainer.appendChild(myCardsTitle);
+  
+    myCardsDiv.innerHTML = "";
     myCards.forEach((card) => {
       const img = document.createElement("img");
       img.src = `media/cards/${card.name.toLowerCase()}.png`;
       img.alt = card.name;
       img.className = "displayed-image tilt-image";
-      imagesContainer.appendChild(img);
+      myCardsDiv.appendChild(img);
     });
+    imagesContainer.appendChild(myCardsDiv);
+  
+    // Exibir a quantidade de cartas dos outros jogadores
+    otherPlayersCardsCountDiv.innerHTML = "<h4>Quantidade de Cartas dos Outros Jogadores</h4>";
+    const playersCardsCountList = document.createElement("div");
+    playersCardsCountList.className = "player-cards-count";
+    
+    console.log("Estado do jogo:", game.state);
+    console.log("Cartas dos jogadores:", game.playerCards);
 
+
+    for (const [playerId, player] of Object.entries(game.state.players)) {
+      if (playerId !== myPlayerId) {
+        const playerCardCountItem = document.createElement("div");
+        playerCardCountItem.className = "player-card-count-item";
+    
+        const playerNameSpan = document.createElement("span");
+        playerNameSpan.className = "player-name";
+        playerNameSpan.textContent = player.name;
+    
+        const cardsCountSpan = document.createElement("span");
+        cardsCountSpan.className = "cards-count";
+        const numCartas = game.playerCards[playerId] ? game.playerCards[playerId].length : 0;
+        cardsCountSpan.textContent = `${numCartas} cartas`;
+
+    
+        playerCardCountItem.appendChild(playerNameSpan);
+        playerCardCountItem.appendChild(cardsCountSpan);
+        playersCardsCountList.appendChild(playerCardCountItem);
+      }
+    }
+    
+  
+    otherPlayersCardsCountDiv.appendChild(playersCardsCountList);
+    imagesContainer.appendChild(otherPlayersCardsCountDiv);
+  
     imagesContainer.classList.add("show");
     overlay.classList.add("show");
-
+  
     window.addEventListener("click", (event) => {
       if (event.target === overlay || event.target === imagesContainer) {
         imagesContainer.classList.remove("show");
         overlay.classList.remove("show");
       }
     });
-
+  
     const tiltImages = document.querySelectorAll(".tilt-image");
     applyTiltEffect(tiltImages);
   });
@@ -459,6 +493,8 @@ socket.on("connect", () => {
 
   socket.on("updateGame", (state) => {
     game.updateGame(state);
+    console.log("Estado do jogo atualizado:", game.state);
+    console.log("Cartas dos jogadores:", game.playerCards);
     if (!game.state.isStarted) {
       myCards = [];
     }

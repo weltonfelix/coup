@@ -334,9 +334,14 @@ input#input {
   left: 50%;
   transform: translate(-50%, -50%);
   display: none;
-  gap: 3rem;
+  flex-direction: column;
+  gap: 1rem;
   align-items: center;
   z-index: 1000;
+  background-color: transparent;
+  padding: 0; 
+  border-radius: 0;
+  box-shadow: none;
 }
 
 .images-container.show {
@@ -506,4 +511,43 @@ div#playersOrder {
 
 div#playersOrder.show {
   display: flex;
+}
+
+.my-cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.other-players-cards-count {
+  margin-top: 1rem; 
+  padding: 1rem;
+  background-color: rgba(245, 245, 245, 0.8); 
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 300px;
+}
+
+.other-players-cards-count h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.other-players-cards-count .player-cards-count {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.other-players-cards-count .player-cards-count .player-card-count-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  background-color: #fff;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }

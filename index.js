@@ -68,7 +68,10 @@ io.on("connection", (socket) => {
 
   if (!game.state.isStarted) {
     game.addPlayer(player);
-    io.emit("updateGame", game.state);
+    io.emit("updateGame", {
+      ...game.state, 
+      playerCards: game.playerCards, 
+    });
     m.sendMessageToAll({
       player: { name: "JOGO" },
       message: `${player.name} entrou no jogo!`,
@@ -135,7 +138,10 @@ io.on("connection", (socket) => {
 
     console.log(`----- GAME STARTED (by ${formattedPlayer}) -----`);
     game.startGame();
-    io.emit("updateGame", game.state); // Update game state for all players, since the game has started
+    io.emit("updateGame", {
+      ...game.state, 
+      playerCards: game.playerCards, 
+    });
     m.sendMessageToAll({
       player: { name: "JOGO" },
       message: `O jogo começou!<br/> A ordem dos jogadores é: ${game.state.playersOrder.join(
@@ -155,7 +161,10 @@ io.on("connection", (socket) => {
     if (!g.checkPlayerInGame()) return;
     commandHandler.stopGame();
     console.log(`----- GAME STOPPED (by ${formattedPlayer}) -----`);
-    io.emit("updateGame", game.state);
+    io.emit("updateGame", {
+      ...game.state, 
+      playerCards: game.playerCards,
+    });
 
     g.resetGame();
 
@@ -170,7 +179,10 @@ io.on("connection", (socket) => {
     if (!g.checkPlayerInGame()) return;
     if (game.state.playerInTurn !== player.id) return;
     game.nextTurn();
-    io.emit("updateGame", game.state);
+    io.emit("updateGame", {
+      ...game.state, 
+      playerCards: game.playerCards,
+    });
     m.sendMessageToAll({
       player: { name: "JOGO" },
       message: `É a vez de ${
@@ -279,7 +291,10 @@ io.on("connection", (socket) => {
       }
     }
 
-    io.emit("updateGame", game.state);
+    io.emit("updateGame", {
+      ...game.state, 
+      playerCards: game.playerCards,
+    });
   });
 });
 
