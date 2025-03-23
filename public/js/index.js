@@ -195,10 +195,6 @@ socket.on("connect", () => {
     const playersCardsCountList = document.createElement("div");
     playersCardsCountList.className = "player-cards-count";
     
-    console.log("Estado do jogo:", game.state);
-    console.log("Cartas dos jogadores:", game.playerCards);
-
-
     for (const [playerId, player] of Object.entries(game.state.players)) {
       if (playerId !== myPlayerId) {
         const playerCardCountItem = document.createElement("div");
@@ -504,8 +500,7 @@ socket.on("connect", () => {
 
   socket.on("updateGame", (state) => {
     game.updateGame(state);
-    console.log("Estado do jogo atualizado:", game.state);
-    console.log("Cartas dos jogadores:", game.playerCards);
+
     if (!game.state.isStarted) {
       myCards = [];
     }
