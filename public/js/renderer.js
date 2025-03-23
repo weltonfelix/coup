@@ -46,15 +46,15 @@ export class Renderer {
   }
 
   showCoinAnimation(numCoins) {
-    if (!this.coinContainer) return; 
+    if (!this.coinContainer) return;
 
     this.coinContainer.innerHTML = "";
 
     for (let i = 0; i < numCoins; i++) {
       const coin = document.createElement("img");
-      coin.src = "media/coin.gif"; 
+      coin.src = "assets/game/coin.gif";
       coin.alt = "Moeda animada";
-      coin.classList.add("coin"); 
+      coin.classList.add("coin");
       this.coinContainer.appendChild(coin);
     }
 
@@ -66,11 +66,11 @@ export class Renderer {
   }
 
   showMurderAnimation() {
-    if (!this.murderAnimation) return; 
+    if (!this.murderAnimation) return;
 
-    this.murderAnimation.style.display = "block"; 
+    this.murderAnimation.style.display = "block";
     setTimeout(() => {
-      this.murderAnimation.style.display = "none"; 
+      this.murderAnimation.style.display = "none";
     }, 2000);
   }
 }
