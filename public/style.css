@@ -551,3 +551,20 @@ div#playersOrder.show {
   border-radius: 0.5rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
+
+
+#inTurnActions button {
+  background-color: white;
+  color: #564bb8;
+  border: 2px solid #564bb8;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+#inTurnActions button:hover {
+  background-color: #564bb8;
+  color: white;
+}
