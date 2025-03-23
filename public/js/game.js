@@ -34,13 +34,15 @@ export class Deck {
     this.cards = [];
     const cardsPerType = numPlayers <= 7 ? 4 : 5;
     for (let i = 0; i < cardsPerType; i++) {
-      this.cards.push(new Card('Duque'));
-      this.cards.push(new Card('Capitão'));
-      this.cards.push(new Card('Assassino'));
-      this.cards.push(new Card('Condessa'));
-      this.cards.push(new Card('Embaixador'));
+      this.cards.push(new Card("Duque"));
+      this.cards.push(new Card("Capitão"));
+      this.cards.push(new Card("Assassino"));
+      this.cards.push(new Card("Condessa"));
+      this.cards.push(new Card("Embaixador"));
     }
-    console.log(`Baralho inicializado com ${cardsPerType} cartas de cada tipo.`);
+    console.log(
+      `Baralho inicializado com ${cardsPerType} cartas de cada tipo.`
+    );
     console.log(this.cards);
   }
 
@@ -73,9 +75,6 @@ export class Deck {
   add(card) {
     this.cards.push(card);
   }
-
-
-
 }
 
 /**
@@ -88,6 +87,7 @@ export class Game {
    * @property {object.<string, Player>} players - Jogadores do jogo
    * @property {boolean} isStarted - Indica se o jogo está iniciado
    * @property {string} playerInTurn - ID do jogador em turno
+   * @property {string[]} playersOrder - Ordem dos jogadores
    */
 
   /**
@@ -128,6 +128,7 @@ export class Game {
     players: {},
     isStarted: false,
     playerInTurn: null,
+    playersOrder: [],
   };
 
   constructor() {
@@ -149,10 +150,17 @@ export class Game {
     if (this.state.isStarted) {
       return;
     }
+    const numPlayers = Object.keys(this.state.players).length;
+
+    if (numPlayers < 2) {
+      console.log("Game cannot start with less than 2 players");
+      return false;
+    }
+
     this.state.isStarted = true;
 
-    console.log('Game started');
-    const numPlayers = Object.keys(this.state.players).length;
+    console.log("Game started");
+
     this.deck = new Deck(numPlayers); // Passa o número de jogadores aqui
     this.deck.shuffle();
 
@@ -164,8 +172,10 @@ export class Game {
     this.state.playerInTurn = Object.keys(this.state.players)[
       Math.floor(Math.random() * Object.keys(this.state.players).length)
     ];
+
+    this.#getPlayersOrder();
+    return true;
   }
-  
 
   /**
    * Finaliza o jogo. Limpa o baralho e as cartas dos jogadores.
@@ -218,13 +228,35 @@ export class Game {
    * @returns {Player|null} Retorna o jogador, ou `null` se não encontrado
    */
   getPlayerByName(name) {
-    if (typeof name !== 'string') {
+    if (typeof name !== "string") {
       return null;
     }
     for (const [_id, player] of Object.entries(this.state.players)) {
       if (player.name.toLowerCase() === name.toLowerCase()) return player;
     }
     return null;
+  }
+
+  nextTurn() {
+    const players = Object.keys(this.state.players);
+    const currentPlayerIndex = players.indexOf(this.state.playerInTurn);
+    const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    this.state.playerInTurn = players[nextPlayerIndex];
+  }
+
+  #getPlayersOrder() {
+    const playerInTurn = this.state.playerInTurn;
+    const playersOrder = [playerInTurn];
+    this.nextTurn();
+    while (this.state.playerInTurn !== playerInTurn) {
+      playersOrder.push(this.state.playerInTurn);
+      this.nextTurn();
+    }
+    console.log("Players order:", playersOrder);
+
+    this.state.playersOrder = playersOrder.map(
+      (playerId) => this.state.players[playerId].name
+    );
   }
 
   /**
@@ -292,16 +324,19 @@ export class Game {
   steal(playerId, targetPlayer) {
     if (!this.#isAlive(this.getPlayerByName(targetPlayer)?.id)) {
       return {
-      message: `Insira um jogador alvo válido`,
+        message: `Insira um jogador alvo válido`,
       };
     } else {
-    const amountStealed = Math.min(this.state.players[this.getPlayerByName(targetPlayer).id].coins, 2);
-    const player = this.state.players[playerId];
+      const amountStealed = Math.min(
+        this.state.players[this.getPlayerByName(targetPlayer).id].coins,
+        2
+      );
+      const player = this.state.players[playerId];
 
-    return {
-      message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer}`,
-    };
-  };
+      return {
+        message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer}`,
+      };
+    }
   }
 
   /**
@@ -356,25 +391,26 @@ export class Game {
    * @param {Array<string>} cardNames - Nomes das cartas a serem devolvidas
    * @returns {Object} Resultado da ação
    */
-/**
- * Devolve cartas ao baralho
- * @param {string} playerId - ID do jogador
- * @param {Array<string>} cardNames - Nomes das cartas a serem devolvidas
- * @returns {Object} Resultado da ação
- */
+  /**
+   * Devolve cartas ao baralho
+   * @param {string} playerId - ID do jogador
+   * @param {Array<string>} cardNames - Nomes das cartas a serem devolvidas
+   * @returns {Object} Resultado da ação
+   */
   returnCards(playerId, cardNames) {
     const player = this.state.players[playerId];
 
     for (const cardName of cardNames) {
-      const cardIndex = this.playerCards[playerId].findIndex(card => card.name === cardName);
+      const cardIndex = this.playerCards[playerId].findIndex(
+        (card) => card.name === cardName
+      );
       if (cardIndex !== -1) {
         const [card] = this.playerCards[playerId].splice(cardIndex, 1);
         this.deck.add(card);
-      }
-      else {
+      } else {
         return {
           message: `Você não tem a carta ${cardName}`,
-          success: false
+          success: false,
         };
       }
     }
@@ -387,7 +423,6 @@ export class Game {
       message: `${player.name} devolveu 2 cartas ao baralho.`,
     };
   }
-
 
   /**
    * Verifica se um jogador está vivo
@@ -423,24 +458,23 @@ export class Game {
       return {
         message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Renda`,
         success: true,
-      }
+      };
     } else if (amount === 2) {
       return {
         message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Ajuda Extra`,
         success: true,
-      }
+      };
     } else if (amount === 3) {
       return {
         message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Imposto (Duque)`,
         success: true,
-      }
+      };
     } else {
       return {
         message: `${this.state.players[playerId].name} pegou ${amount} moedas`,
         success: true,
-      }
+      };
     }
-
   }
 
   /**
@@ -454,12 +488,12 @@ export class Game {
       return {
         message: `Você tem apenas ${player.coins} moedas`,
         success: false,
-      }
+      };
     }
     player.coins -= amount;
     return {
       message: `${player.name} pagou ${amount} moedas`,
       success: true,
-    }
+    };
   }
 }

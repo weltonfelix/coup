@@ -5,14 +5,21 @@ const formElement = document.getElementById("form");
 const inputElement = document.getElementById("input");
 const submitButtonElement = document.getElementById("submit-button");
 const messagesElement = document.getElementById("messages");
+const inTurnActionsDivElement = document.getElementById("inTurnActions");
+const playersOrderElement = document.getElementById("playersOrder");
+const playersOrderTextElement = document.getElementById("playersOrder-field");
 
 // Selecionar os elementos dos botões e pop-ups
 const popupButton = document.getElementById("popup-button");
 const popupContainer = document.getElementById("popup-container");
 const closePopup = document.getElementById("close-popup");
 
-const cardsButton = document.querySelector(".bottom-button-1 .bottom-button-cards");
-const coinsButton = document.querySelector(".bottom-button-2 .bottom-button-coins");
+const cardsButton = document.querySelector(
+  ".bottom-button-1 .bottom-button-cards"
+);
+const coinsButton = document.querySelector(
+  ".bottom-button-2 .bottom-button-coins"
+);
 
 const overlay = document.getElementById("overlay");
 
@@ -60,7 +67,7 @@ function applyTiltEffect(images) {
   images.forEach((image) => {
     image.addEventListener("mousemove", (event) => {
       const rect = image.getBoundingClientRect();
-      
+
       const mouseX = (event.clientX - rect.left) / (rect.right - rect.left);
       const mouseY = (event.clientY - rect.top) / (rect.bottom - rect.top);
 
@@ -68,20 +75,22 @@ function applyTiltEffect(images) {
       const tiltY = (mouseX - 0.7) * -20;
 
       image.style.transform = `perspective(1000px) rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
-      image.style.boxShadow = `${tiltY * 2}px ${tiltX * 2}px 20px rgba(0, 0, 0, 0.3)`;
+      image.style.boxShadow = `${tiltY * 2}px ${
+        tiltX * 2
+      }px 20px rgba(0, 0, 0, 0.3)`;
     });
 
     image.addEventListener("mouseleave", () => {
       image.style.transform = "perspective(1000px) rotateX(0) rotateY(0)";
       image.style.boxShadow = "0 10px 20px rgba(0, 0, 0, 0.2)";
-      
+
       image.style.transition = "transform 0.5s ease, box-shadow 0.5s ease";
-      
+
       setTimeout(() => {
         image.style.transition = "";
       }, 500);
     });
-    
+
     image.style.transformStyle = "preserve-3d";
     image.style.willChange = "transform";
   });
@@ -132,6 +141,20 @@ socket.on("connect", () => {
   const myPlayerId = socket.id;
   let myCards = [];
 
+  function updatedCurrentPlayerOrder() {
+    const playerInTurnName = game.state.players[game.state.playerInTurn]?.name;
+    if (!playerInTurnName) return;
+
+    playersOrderTextElement.innerHTML = game.state.playersOrder
+      .map((player) => {
+        if (player === playerInTurnName) {
+          return `<strong>${player}</strong>`;
+        }
+        return player;
+      })
+      .join(" → ");
+  }
+
   popupButton.addEventListener("click", () => {
     popupContainer.classList.add("show");
   });
@@ -149,7 +172,7 @@ socket.on("connect", () => {
   cardsButton.addEventListener("click", () => {
     const imagesContainer = document.getElementById("images-container");
     imagesContainer.innerHTML = "";
-  
+
     const title = document.createElement("div");
     title.className = "images-title";
     if (myCards && myCards.length > 0) {
@@ -158,7 +181,7 @@ socket.on("connect", () => {
       title.textContent = "Você não possui cartas.";
     }
     imagesContainer.appendChild(title);
-  
+
     myCards.forEach((card) => {
       const img = document.createElement("img");
       img.src = `media/cards/${card.name.toLowerCase()}.png`;
@@ -166,7 +189,7 @@ socket.on("connect", () => {
       img.className = "displayed-image tilt-image";
       imagesContainer.appendChild(img);
     });
-    
+
     imagesContainer.classList.add("show");
     overlay.classList.add("show");
 
@@ -193,7 +216,6 @@ socket.on("connect", () => {
       }
     });
   });
-  
 
   const playerActions = {
     "/moedas": () => {
@@ -209,7 +231,7 @@ socket.on("connect", () => {
     },
     "/cartas": () => {
       renderSecretMessage(
-        `Suas cartas: <br/> ${myCards.map((card) => card.name).join('<br/>')}.`
+        `Suas cartas: <br/> ${myCards.map((card) => card.name).join("<br/>")}.`
       );
     },
   };
@@ -218,23 +240,22 @@ socket.on("connect", () => {
     "/pegar": (amount) => {
       socket.emit("gameAction", { action: "drawCoins", param: amount });
     },
-    '/renda': () => {
-      socket.emit('gameAction', { action: 'drawCoins', param: 1 });
+    "/renda": () => {
+      socket.emit("gameAction", { action: "drawCoins", param: 1 });
     },
-    '/ajudaextra': () => {
-      socket.emit('gameAction', { action: 'drawCoins', param: 2 });
+    "/ajudaexterna": () => {
+      socket.emit("gameAction", { action: "drawCoins", param: 2 });
     },
-    '/duque': () => {
-      socket.emit('gameAction', { action: 'drawCoins', param: 3 });
+    "/duque": () => {
+      socket.emit("gameAction", { action: "drawCoins", param: 3 });
     },
-    '/roubar': (target) => {
-      socket.emit('gameAction', { action: 'steal', param: target });
+    "/roubar": (target) => {
+      socket.emit("gameAction", { action: "steal", param: target });
     },
-    '/pagar': (amount) => {
-      socket.emit('gameAction', { action: 'payCoins', param: amount });
+    "/pagar": (amount) => {
+      socket.emit("gameAction", { action: "payCoins", param: amount });
     },
     "/dropassassinato": (cardName) => {
-
       if (
         !myCards.find(
           (card) => card.name.toLowerCase() === cardName[0].toLowerCase()
@@ -242,7 +263,10 @@ socket.on("connect", () => {
       ) {
         return renderSecretMessage("Você não tem essa carta.");
       }
-      socket.emit("gameAction", { action: "dropCardMurder", param: cardName[0] });
+      socket.emit("gameAction", {
+        action: "dropCardMurder",
+        param: cardName[0],
+      });
       myCards.splice(
         myCards.findIndex((card) => card.name === cardName[0]),
         1
@@ -293,6 +317,9 @@ socket.on("connect", () => {
       }
       socket.emit("gameAction", { action: "returnCards", param: cartas2 });
     },
+    "/proximo": () => {
+      socket.emit("nextTurn");
+    },
   };
 
   inputElement.addEventListener("keydown", (event) => {
@@ -313,7 +340,7 @@ socket.on("connect", () => {
   submitButtonElement.addEventListener("click", () => {
     formElement.dispatchEvent(new Event("submit"));
     inputElement.focus();
-  } )
+  });
 
   formElement.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -361,38 +388,48 @@ socket.on("connect", () => {
     inputElement.value = "";
   });
 
-const playerColors = {};
-
-function getPlayerColor(playerName) {
-  if (!playerColors[playerName]) {
-    const colors = [
-      'player-name-color-1',
-      'player-name-color-2',
-      'player-name-color-3',
-      'player-name-color-4',
-      'player-name-color-5',
-      'player-name-color-6',
-      'player-name-color-7',
-      'player-name-color-8',
-      'player-name-color-9',
-      'player-name-color-10',
-    ];
-
-    const hash = playerName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-    const index = hash % colors.length;
-    playerColors[playerName] = colors[index];
+  const inTurnActionButtonsEls = inTurnActionsDivElement.children;
+  for (const button of inTurnActionButtonsEls) {
+    button.addEventListener("click", () => {
+      const command = button.getAttribute("data-command");
+      inputElement.value = command;
+      inputElement.focus();
+    });
   }
 
-  return playerColors[playerName];
-}
+  const playerColors = {};
 
+  function getPlayerColor(playerName) {
+    if (!playerColors[playerName]) {
+      const colors = [
+        "player-name-color-1",
+        "player-name-color-2",
+        "player-name-color-3",
+        "player-name-color-4",
+        "player-name-color-5",
+        "player-name-color-6",
+        "player-name-color-7",
+        "player-name-color-8",
+        "player-name-color-9",
+        "player-name-color-10",
+      ];
+
+      const hash = playerName
+        .split("")
+        .reduce((acc, char) => acc + char.charCodeAt(0), 0);
+      const index = hash % colors.length;
+      playerColors[playerName] = colors[index];
+    }
+
+    return playerColors[playerName];
+  }
 
   console.log(`${playerName} connected: ${myPlayerId}`);
   socket.on("messageReceived", ({ player, message }) => {
     if (player.id === myPlayerId) {
       return;
     }
-  
+
     if (player.name === "JOGO" || player.name === "JOGO (secreto)") {
       renderer.renderReceivedMessage(player, message);
     } else {
@@ -405,17 +442,17 @@ function getPlayerColor(playerName) {
       `;
       messagesElement.prepend(messageEl);
     }
-  
+
     console.log(message);
-  
-    if (message.includes('Renda')) {
-      console.log('renda');
+
+    if (message.includes("Renda")) {
+      console.log("renda");
       renderer.showCoinAnimation(1);
-    } else if (message.includes('Ajuda Extra')) {
+    } else if (message.includes("Ajuda Extra")) {
       renderer.showCoinAnimation(2);
-    } else if (message.includes('Imposto')) {
+    } else if (message.includes("Imposto")) {
       renderer.showCoinAnimation(3);
-    } else if (message.includes('assassinado')) {
+    } else if (message.includes("assassinado")) {
       renderer.showMurderAnimation();
     }
   });
@@ -425,15 +462,34 @@ function getPlayerColor(playerName) {
     if (!game.state.isStarted) {
       myCards = [];
     }
+    if (game.state.playersOrder.length > 0) {
+      playersOrderElement.classList.add("show");
+    } else {
+      playersOrderElement.classList.remove("show");
+    }
+    updatedCurrentPlayerOrder();
+
+    if (game.state.playerInTurn === myPlayerId) {
+      inTurnActionsDivElement.classList.add("show");
+    } else {
+      inTurnActionsDivElement.classList.remove("show");
+    }
   });
 
   socket.on("updateCards", ({ cards }) => {
     console.log("Game started");
     myCards = cards;
     renderer.renderReceivedMessage(
-      { name: 'JOGO' },
-      `Suas cartas: <br/> ${myCards.map((card) => card.name).join('<br/>')}`
+      { name: "JOGO" },
+      `Suas cartas: <br/> ${myCards.map((card) => card.name).join("<br/>")}`
     );
+  });
+
+  socket.on("gameStopped", () => {
+    playersOrderElement.classList.remove("show");
+    inTurnActionsDivElement.classList.remove("show");
+    playersOrderTextElement.innerHTML = "";
+    playersOrder = [];
   });
 
   socket.on("disconnect", () => {
@@ -444,6 +500,8 @@ function getPlayerColor(playerName) {
       "Você foi desconectado. Recarregue a página para jogar novamente."
     );
     inputElement.disabled = true;
+    playersOrderElement.classList.remove("show");
+    inTurnActionsDivElement.classList.remove("show");
     const reloadButton = document.createElement("button");
     reloadButton.textContent = "Recarregar";
     reloadButton.onclick = () => window.location.reload();

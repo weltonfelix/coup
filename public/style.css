@@ -6,18 +6,24 @@
 }
 
 body {
+  font-family: 'Roboto', 'Ubuntu', 'Arial', sans-serif;
+}
+
+main {
   display: flex;
   flex-direction: column;
   max-width: 800px;
-  margin: 0 auto;
-  font-family: 'Roboto', 'Ubuntu', 'Arial', sans-serif;
+  margin: 0.5rem auto;
+  padding: 0.5rem;
+  height: calc(100% - 1rem);
+  height: calc(100vh - 1rem);
+  height: calc(100dvh - 1rem);
 }
 
 #form {
   width: 100%;
   bottom: 0.5rem;
   display: flex;
-  padding: 0.5rem;
   gap: 0.5rem;
 }
 
@@ -25,19 +31,18 @@ input#input {
   width: 100%;
   font-size: 1.5rem;
   border-radius: 0.5rem;
+  padding: 0.2rem;
 }
 
 #messages {
   display: flex;
-  height: calc(100% - 4rem);
-  height: calc(100vh - 4rem);
-  height: calc(100dvh - 4rem);
+  height: 100%;
   flex-direction: column-reverse; /* Reverse the order of messages, so the latest one is at the bottom.
                                     This is to make the scrollbar start at the bottom. */
   gap: 0.5rem;
-  padding: 0.5rem;
   overflow-y: scroll;
   width: 100%;
+  padding: 3.5rem 0 1rem 0;
 }
 
 #messages li {
@@ -437,29 +442,68 @@ input#input {
 }
 
 .player-name-color-4 {
-  color: #ff3b30; 
+  color: #ff3b30;
 }
 
 .player-name-color-5 {
-  color: #5856d6; 
+  color: #5856d6;
 }
 
 .player-name-color-6 {
-  color: #ffcc00; 
+  color: #ffcc00;
 }
 
 .player-name-color-7 {
-  color: #007aff; 
+  color: #007aff;
 }
 
 .player-name-color-8 {
-  color: #ff2d55; 
+  color: #ff2d55;
 }
 
 .player-name-color-9 {
-  color: #ff9f0a; 
+  color: #ff9f0a;
 }
 
 .player-name-color-10 {
-  color: #30d158; 
+  color: #30d158;
+}
+
+div#inTurnActions {
+  display: none;
+  gap: 1rem;
+  margin: 0.5rem 0;
+  justify-content: space-between;
+}
+
+div#inTurnActions.show {
+  display: flex;
+}
+
+div#inTurnActions button {
+  padding: 0.5rem 1rem;
+  width: 100%;
+  background-color: transparent;
+  color: #564bb8;
+  font-size: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #564bb8;
+  cursor: pointer;
+}
+
+div#playersOrder {
+  display: none;
+  position: absolute;
+  top: 2rem;
+  background: #b2b2d5;
+  left: 0;
+  right: 0;
+  margin: 0 auto;
+  width: fit-content;
+  padding: 0.3rem 1rem;
+  border-radius: 1rem;
+}
+
+div#playersOrder.show {
+  display: flex;
 }

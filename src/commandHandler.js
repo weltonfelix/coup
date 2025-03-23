@@ -1,15 +1,21 @@
+import { Game } from "../public/js/game.js";
+
 export class CommandHandler {
+  /**
+   * @type {Game}
+   */
   game;
   constructor(game) {
     this.game = game;
   }
 
   startGame(sockets) {
-    this.game.startGame();
+    const success = this.game.startGame();
+    if (!success) {
+      return false;
+    }
     this.#distributeCards(sockets);
-
-    const playerInTurn = this.game.state.playerInTurn;
-    return this.#getPlayersOrder(playerInTurn);
+    return true;
   }
 
   stopGame() {
@@ -27,16 +33,5 @@ export class CommandHandler {
         cards: this.game.playerCards[playerId],
       });
     }
-  }
-
-  #getPlayersOrder(playerInTurn) {
-    const playersOrder = [playerInTurn];
-    while (this.game.state.playerInTurn !== playerInTurn) {
-      playersOrder.push(this.game.state.playerInTurn);
-    }
-
-    return Object.values(this.game.state.players).map(
-      (player) => player.name
-    );
   }
 }

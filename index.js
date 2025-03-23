@@ -1,18 +1,18 @@
-import express from 'express';
-import http from 'node:http';
-import { Server } from 'socket.io';
-import { Game } from './public/js/game.js';
-import { CommandHandler } from './src/commandHandler.js';
-import { GameActionHandler } from './src/gameActionHandler.js';
-import { MessageHelper } from './src/messageHelper.js';
-import { GameHelper } from './src/gameHelper.js';
+import express from "express";
+import http from "node:http";
+import { Server } from "socket.io";
+import { Game } from "./public/js/game.js";
+import { CommandHandler } from "./src/commandHandler.js";
+import { GameActionHandler } from "./src/gameActionHandler.js";
+import { MessageHelper } from "./src/messageHelper.js";
+import { GameHelper } from "./src/gameHelper.js";
 
 const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server);
 
-app.use(express.static('public'));
+app.use(express.static("public"));
 
 const game = new Game();
 const commandHandler = new CommandHandler(game, io);
@@ -22,31 +22,31 @@ let messages = [];
 // Message Helper (m)
 const m = new MessageHelper(io, messages);
 
-io.on('connection', (socket) => {
+io.on("connection", (socket) => {
   console.log(
     `${socket.id} trying to connect using name: ${socket.handshake.auth.name}`
   );
   if (!socket.handshake.auth.name.trim()) {
-    console.log('Player disconnected: No name provided');
-    socket.emit('messageReceived', {
-      player: { name: 'JOGO' },
+    console.log("Player disconnected: No name provided");
+    socket.emit("messageReceived", {
+      player: { name: "JOGO" },
       message:
-        'Nome de jogador não fornecido. Recarregue a página e tente novamente.',
+        "Nome de jogador não fornecido. Recarregue a página e tente novamente.",
     });
     return socket.disconnect();
   }
 
   if (
     game.getPlayerByName(socket.handshake.auth.name) ||
-    socket.handshake.auth.name === 'JOGO'
+    socket.handshake.auth.name === "JOGO"
   ) {
     // Se o jogador já estiver no jogo, ou se o nome for "JOGO", desconectar
     // "JOGO" é o nome reservado para o sistema de mensagens
-    console.log('Player disconnected: Name already in use');
-    socket.emit('messageReceived', {
-      player: { name: 'JOGO' },
+    console.log("Player disconnected: Name already in use");
+    socket.emit("messageReceived", {
+      player: { name: "JOGO" },
       message:
-        'Nome de jogador já em uso. Recarregue a página e tente novamente.',
+        "Nome de jogador já em uso. Recarregue a página e tente novamente.",
     });
     return socket.disconnect();
   }
@@ -60,7 +60,7 @@ io.on('connection', (socket) => {
   console.log(`Player connected: ${player.name} - ${player.id}`);
 
   for (const message of messages) {
-    socket.emit('messageReceived', message);
+    socket.emit("messageReceived", message);
   }
 
   // Game Helper (g)
@@ -68,30 +68,30 @@ io.on('connection', (socket) => {
 
   if (!game.state.isStarted) {
     game.addPlayer(player);
-    io.emit('updateGame', game.state);
+    io.emit("updateGame", game.state);
     m.sendMessageToAll({
-      player: { name: 'JOGO' },
+      player: { name: "JOGO" },
       message: `${player.name} entrou no jogo!`,
     });
   } else {
     m.sendMessageToAll({
-      player: { name: 'JOGO' },
+      player: { name: "JOGO" },
       message: `${player.name} entrou como espectador`,
     });
-    socket.emit('messageReceived', {
-      player: { name: 'JOGO' },
+    socket.emit("messageReceived", {
+      player: { name: "JOGO" },
       message:
-        'O jogo já começou. Você pode assistir, mas não pode participar.',
+        "O jogo já começou. Você pode assistir, mas não pode participar.",
     });
   }
 
-  socket.on('sendMessage', (message, callback) => {
+  socket.on("sendMessage", (message, callback) => {
     console.log(`Player ${formattedPlayer} sent: ${message}`);
     m.sendMessageToOthers(socket, { player, message });
     callback(); // Essa função é chamada para confirmar ao cliente que a mensagem foi recebida
   });
 
-  socket.on('disconnect', () => {
+  socket.on("disconnect", () => {
     console.log(`Player disconnected: ${formattedPlayer}`);
     game.removePlayer(player.id);
     if (
@@ -100,97 +100,128 @@ io.on('connection', (socket) => {
       ).length === 0
     ) {
       game.stopGame();
+      messages = [];
+    } else if (game.state.playerInTurn === player.id) {
+      game.nextTurn();
     }
-    socket.broadcast.emit('updateGame', game.state);
+    socket.broadcast.emit("updateGame", game.state);
     m.sendMessageToAll({
-      player: { name: 'JOGO' },
+      player: { name: "JOGO" },
       message: `${player.name} saiu`,
     });
   });
 
-  socket.on('startGame', () => {
+  socket.on("startGame", () => {
     if (game.state.isStarted) {
       return; // Game already started
     }
     if (!g.checkPlayerInGame()) return;
-    const playersOrderNames = commandHandler.startGame(io.sockets.sockets);
-    console.log(playersOrderNames)
+
+    if (io.sockets.sockets.size < 2) {
+      return m.sendMessageToAll({
+        player: { name: "JOGO" },
+        message: "É necessário pelo menos 2 jogadores para iniciar o jogo.",
+      });
+    }
+
+    const success = commandHandler.startGame(io.sockets.sockets);
+
+    if (!success) {
+      return m.sendMessageToAll({
+        player: { name: "JOGO" },
+        message: "Erro ao iniciar o jogo.",
+      });
+    }
+
     console.log(`----- GAME STARTED (by ${formattedPlayer}) -----`);
     game.startGame();
-    io.emit('updateGame', game.state); // Update game state for all players, since the game has started
+    io.emit("updateGame", game.state); // Update game state for all players, since the game has started
     m.sendMessageToAll({
-      player: { name: 'JOGO' },
-      message: `O jogo começou!<br/> A ordem dos jogadores é: ${playersOrderNames.join(
-        ' → '
+      player: { name: "JOGO" },
+      message: `O jogo começou!<br/> A ordem dos jogadores é: ${game.state.playersOrder.join(
+        " → "
       )}`,
     });
+
     m.sendMessageToAll({
-      player: { name: 'JOGO' },
+      player: { name: "JOGO" },
       message: `É a vez de ${
         game.state.players[game.state.playerInTurn].name
       }.`,
     });
   });
 
-  socket.on('stopGame', () => {
+  socket.on("stopGame", () => {
     if (!g.checkPlayerInGame()) return;
     commandHandler.stopGame();
     console.log(`----- GAME STOPPED (by ${formattedPlayer}) -----`);
-    io.emit('updateGame', game.state);
+    io.emit("updateGame", game.state);
 
     g.resetGame();
 
     m.sendMessageToAll({
-      player: { name: 'JOGO' },
-      message: 'O jogo foi encerrado.',
+      player: { name: "JOGO" },
+      message: "O jogo foi encerrado.",
+    });
+    io.emit("gameStopped");
+  });
+
+  socket.on("nextTurn", () => {
+    if (!g.checkPlayerInGame()) return;
+    if (game.state.playerInTurn !== player.id) return;
+    game.nextTurn();
+    io.emit("updateGame", game.state);
+    m.sendMessageToAll({
+      player: { name: "JOGO" },
+      message: `É a vez de ${
+        game.state.players[game.state.playerInTurn].name
+      }.`,
     });
   });
 
-  socket.on('gameAction', ({ action, param }) => {
+  socket.on("gameAction", ({ action, param }) => {
     if (!g.checkPlayerInGame()) return;
 
-    let resultObject = {}
-    let proceedGame = true;
+    let resultObject = {};
 
     switch (action) {
-
-      case 'dropCardMurder':
+      case "dropCardMurder":
         resultObject = gameActionHandler.dropCardMurder(player, param);
         if (!resultObject) {
           return m.sendMessageToAll({
-            player: { name: 'JOGO' },
+            player: { name: "JOGO" },
             message: `Erro. Tente novamente`,
           });
         }
         break;
 
-      case 'dropCardCoup':
+      case "dropCardCoup":
         resultObject = gameActionHandler.dropCardCoup(player, param);
         if (!resultObject) {
           return m.sendMessageToAll({
-            player: { name: 'JOGO' },
+            player: { name: "JOGO" },
             message: `Erro. Tente novamente`,
           });
         }
         break;
 
-      case 'drawCoins':
+      case "drawCoins":
         resultObject = gameActionHandler.drawCoins(player, param);
         break;
 
-      case 'payCoins':
+      case "payCoins":
         resultObject = gameActionHandler.payCoins(player, param);
         break;
 
-      case 'steal':
+      case "steal":
         resultObject = gameActionHandler.steal(player, param);
         break;
 
-      case 'exchangeCard':
+      case "exchangeCard":
         resultObject = gameActionHandler.exchangeCard(player, param);
-        socket.emit('updateCards', {
+        socket.emit("updateCards", {
           cards: game.playerCards[player.id],
-        })
+        });
         break;
 
       case 'ambassador':
@@ -200,9 +231,9 @@ io.on('connection', (socket) => {
         });
         break;
 
-      case 'returnCards':
+      case "returnCards":
         resultObject = gameActionHandler.returnCards(player, param);
-        socket.emit('updateCards', {
+        socket.emit("updateCards", {
           cards: game.playerCards[player.id],
         });
 
@@ -219,26 +250,27 @@ io.on('connection', (socket) => {
             message: resultObject.message,
           });
         }
-        
+
         return;
-        
+
 
         break;
 
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);
         return m.sendMessageToAll({
-          player: { name: 'JOGO' },
+          player: { name: "JOGO" },
           message: `Ação inválida: ${action}`,
         });
     }
 
     console.log(`Player ${formattedPlayer} performed action: ${action}`);
-    if (action != 'returnCards') {
-    m.sendMessageToAll({
-      player: { name: 'JOGO' },
-      message: resultObject.message,
-    });}
+    if (action != "returnCards") {
+      m.sendMessageToAll({
+        player: { name: "JOGO" },
+        message: resultObject.message,
+      });
+    }
 
     if (g.checkLose()) {
       if (g.checkGameWon()) {
@@ -247,11 +279,11 @@ io.on('connection', (socket) => {
       }
     }
 
-    io.emit('updateGame', game.state);
+    io.emit("updateGame", game.state);
   });
 });
 
 const port = process.env.PORT || 3000;
 server.listen(port, () => {
-  console.log('Server is running on port ' + port);
+  console.log("Server is running on port " + port);
 });
