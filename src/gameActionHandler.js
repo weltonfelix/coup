@@ -44,4 +44,8 @@ export class GameActionHandler {
   steal(player, target) {
     return this.game.steal(player.id, target);
   }
+
+  revealCards(player, cardNames) {
+    return this.game.revealCards(player.id, cardNames);
+  }
 }

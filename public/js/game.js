@@ -498,4 +498,43 @@ export class Game {
       success: true,
     };
   }
+
+  /**
+   * Revela uma ou mais cartas do jogador sem removê-las.
+   * @param {string} playerId - ID do jogador
+   * @param {Array<string>} cardNames - Nomes das cartas a serem reveladas
+   * @returns {Object} Resultado da ação
+   */
+  revealCards(playerId, cardNames) {
+    const player = this.state.players[playerId];
+    const revealedCards = [];
+  
+    for (const cardName of cardNames) {
+      const card = this.playerCards[playerId].find(
+        (card) => card.name.toLowerCase() === cardName.toLowerCase()
+      );
+  
+      if (card) {
+        revealedCards.push(card);
+      } else {
+        return {
+          message: `Você não tem a carta ${cardName}`,
+          success: false,
+        };
+      }
+    }
+  
+    // Adiciona as cartas reveladas ao estado do jogo (para exibição)
+    if (!this.state.revealedCards) {
+      this.state.revealedCards = {};
+    }
+    this.state.revealedCards[playerId] = revealedCards;
+  
+    return {
+      success: true,
+      message: `${player.name} revelou as cartas: ${revealedCards.map(card => card.name).join(', ')}`,
+      revealedCards,
+    };
+  }
+
 }

@@ -523,7 +523,7 @@ div#playersOrder.show {
 .other-players-cards-count {
   margin-top: 1rem; 
   padding: 1rem;
-  background-color: rgba(245, 245, 245, 0.8); 
+  background-color: rgba(245, 245, 245); 
   border-radius: 0.5rem;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   width: 100%;

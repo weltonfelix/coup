@@ -262,12 +262,19 @@ io.on("connection", (socket) => {
             message: resultObject.message,
           });
         }
-
         return;
-
-
         break;
-
+      case "revealCards":
+        resultObject = gameActionHandler.revealCards(player, param);
+        if (!resultObject.success) {
+          // Envia a mensagem de erro apenas para o jogador que tentou revelar a carta
+          socket.emit("messageReceived", {
+            player: { name: "JOGO" },
+            message: resultObject.message,
+          });
+          return; // Não continua com o restante da lógica
+        }
+        break;
       default:
         console.error(`Invalid action: ${action} by ${formattedPlayer}`);
         return m.sendMessageToAll({
