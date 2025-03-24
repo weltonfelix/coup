@@ -8,3 +8,69 @@
 body {
   font-family: 'Roboto', 'Ubuntu', 'Arial', sans-serif;
 }
+
+/* (Mantendo todo o CSS existente) */
+
+/* === Estilos do Modal (NOVO) === */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+  font-family: "Irish Grover", cursive;
+}
+
+.modal-content {
+  background: linear-gradient(135deg, #1a1a1a 0%, #3a3a3a 100%);
+  border-radius: 1rem;
+  padding: 2rem;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  overflow-y: auto;
+  border: 3px solid #b51e79;
+  box-shadow: 0 0 30px rgba(181, 30, 121, 0.7);
+  color: white;
+  position: relative;
+}
+
+.close-button {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  font-size: 2rem;
+  color: #b51e79;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.close-button:hover {
+  transform: scale(1.2);
+}
+
+.rules-text {
+  text-align: left;
+  line-height: 1.6;
+  padding: 0 10px;
+}
+
+.rules-text h3 {
+  color: #398e9c;
+  margin-top: 1.5rem;
+  border-bottom: 1px solid #b51e79;
+  padding-bottom: 5px;
+}
+
+/* Responsividade (NOVO) */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 1.5rem;
+    width: 95%;
+  }
+}
