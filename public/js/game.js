@@ -463,7 +463,7 @@ export class Game {
       };
     } else if (amount === 2) {
       return {
-        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Ajuda Extra`,
+        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Ajuda Externa`,
         success: true,
       };
     } else if (amount === 3) {
