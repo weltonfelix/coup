@@ -577,3 +577,8 @@ div#playersOrder.show {
   background-color: #B51E79;
   color: white;
 }
+
+#inTurnActions button:focus {
+  outline: none;
+  box-shadow: none;
+}
