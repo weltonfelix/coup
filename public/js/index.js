@@ -327,14 +327,13 @@ socket.on("connect", () => {
       );
     },
     "/trocar": (cardName) => {
-      if (
-        !myCards.find(
-          (card) => card.name.toLowerCase() === cardName.toLowerCase()
-        )
-      ) {
+      const cardNameString = cardName[0];
+
+      if (!myCards.find((card) => card.name.toLowerCase() === cardNameString.toLowerCase())) {
         return renderSecretMessage("Você não tem essa carta.");
       }
-      socket.emit("gameAction", { action: "exchangeCard", param: cardName });
+
+      socket.emit("gameAction", { action: "exchangeCard", param: cardNameString });
       // Não precisa remover, pois vai receber as duas cartas de volta com um updateCards
     },
     "/embaixador": () => {
@@ -499,8 +498,9 @@ socket.on("connect", () => {
 
   socket.on("updateGame", (state) => {
     game.updateGame(state);
-    console.log("Estado do jogo atualizado:", game.state);
-    console.log("Cartas dos jogadores:", game.playerCards);
+    if (game.state.players[myPlayerId]) {
+      myCards = game.playerCards[myPlayerId] || [];
+    }  
     if (!game.state.isStarted) {
       myCards = [];
     }
