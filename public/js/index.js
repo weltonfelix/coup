@@ -347,17 +347,6 @@ socket.on("connect", () => {
       }
       socket.emit("gameAction", { action: "returnCards", param: cartas2 });
     },
-    "/revelar": (cardNames) => {
-      if (!game.state.isStarted) {
-        return renderSecretMessage(`O jogo ainda não começou.`);
-      }
-      if (!game.isPlayerInGame(myPlayerId)) {
-        return renderSecretMessage(
-          "Você não está no jogo! Espere o próximo jogo começar."
-        );
-      }
-      socket.emit("gameAction", { action: "revealCards", param: cardNames });
-    },
     "/proximo": () => {
       socket.emit("nextTurn");
     },
