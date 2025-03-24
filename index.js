@@ -243,31 +243,7 @@ io.on("connection", (socket) => {
         });
         break;
 
-        case "returnCards":
-          resultObject = gameActionHandler.returnCards(player, param);
-          socket.emit("updateCards", {
-            cards: game.playerCards[player.id],
-          });
-      
-          if (!resultObject.success) {
-            socket.emit('messageReceived', {
-              player: { name: 'JOGO' },
-              message: resultObject.message,
-            });
-          } else {
-            m.sendMessageToAll({
-              player: { name: 'JOGO' },
-              message: resultObject.message,
-            });
-      
-            // Emitir updateGame para todos os jogadores após a ação de devolver cartas
-            io.emit("updateGame", {
-              ...game.state,
-              playerCards: game.playerCards,
-            });
-          }
-          return;
-          break;
+      case "returnCards":
         resultObject = gameActionHandler.returnCards(player, param);
         socket.emit("updateCards", {
           cards: game.playerCards[player.id],

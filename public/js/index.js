@@ -500,7 +500,8 @@ socket.on("connect", () => {
 
   socket.on("updateGame", (state) => {
     game.updateGame(state);
-
+    console.log("Estado do jogo atualizado:", game.state);
+    console.log("Cartas dos jogadores:", game.playerCards);
     if (!game.state.isStarted) {
       myCards = [];
     }
