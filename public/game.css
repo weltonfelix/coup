@@ -104,6 +104,18 @@ input#input {
   font-size: 0.8rem;
 }
 
+#messages li.received-from-game.event {
+  background-color: transparent !important;
+  color: #555;
+  text-align: center;
+  margin: 0.5rem auto;
+  padding: 0;
+  max-width: 100%;
+  font-style: italic;
+  border: none;
+  box-shadow: none;
+}
+
 #coin-container {
   position: absolute;
   top: 50%;
@@ -246,16 +258,6 @@ input#input {
   line-height: 1.5;
 }
 
-#popup-container-images .popup-content {
-  width: 300px;
-}
-
-#popup-container-images .popup-body {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
 .cards-button {
   position: absolute;
   top: 3rem;
@@ -305,7 +307,7 @@ input#input {
   display: block;
 }
 
-.images-title {
+.cards-title {
   position: absolute;
   top: -40px;
   left: 50%;
@@ -317,7 +319,7 @@ input#input {
   z-index: 101;
 }
 
-.images-container {
+.cards-container {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -333,12 +335,12 @@ input#input {
   box-shadow: none;
 }
 
-.images-container.show {
+.cards-container.show {
   display: flex;
 }
 
-.displayed-image {
-  width: 40vw;
+.displayed-cards {
+  width: 35vw;
   max-width: 15rem;
   height: auto;
 }
@@ -346,8 +348,8 @@ input#input {
 .close-button-cards,
 .close-button-coins {
   position: absolute;
-  top: -2.5rem;
-  right: -2.5rem;
+  top: -5.5rem;
+  right: -2rem;
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 50%;
@@ -506,7 +508,7 @@ div#playersOrder.show {
 
 .my-cards {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   gap: 1rem;
   justify-content: center;
 }

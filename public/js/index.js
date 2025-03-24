@@ -35,21 +35,25 @@ const updateHistory = (command) => {
   }
 };
 
-let playerName = window.prompt("Qual o seu nome?");
-if (!playerName) {
-  renderer.renderReceivedMessage(
-    { name: "JOGO" },
-    "Você precisa de um nome para jogar. Recarregue a página e tente novamente."
-  );
-  throw new Error("No name provided");
-}
+let playerName;
+let isValid = false;
 
-if (playerName.length > 12) {
-  renderer.renderReceivedMessage(
-    { name: "JOGO" },
-    "O nome do jogador não pode ter mais de 12 caracteres. Recarregue a página e tente novamente."
-  );
-  throw new Error("Name too long");
+while (!isValid) {
+  playerName = window.prompt("Qual o seu nome? (Máximo 12 caracteres)");
+  
+  if (!playerName) {
+    renderer.renderReceivedMessage(
+      { name: "JOGO" },
+      "Você precisa de um nome para jogar. Recarregue a página e tente novamente."
+    );
+    throw new Error("No name provided");
+  }
+
+  if (playerName.length > 12) {
+    alert("O nome não pode ter mais de 12 caracteres. Tente novamente.");
+  } else {
+    isValid = true; // Sai do loop se o nome for válido
+  }
 }
 
 const socket = io({
@@ -178,7 +182,7 @@ socket.on("connect", () => {
   });
 
   cardsButton.addEventListener("click", () => {
-    const imagesContainer = document.getElementById("images-container");
+    const cardsContainer = document.getElementById("cards-container");
     const myCardsTitle = document.getElementById("my-cards-title");
     const myCardsDiv = document.getElementById("my-cards");
     const otherPlayersCardsCountDiv = document.getElementById("other-players-cards-count");
@@ -187,17 +191,17 @@ socket.on("connect", () => {
     myCardsDiv.innerHTML = "";
     otherPlayersCardsCountDiv.innerHTML = "<h4>Quantidade de Cartas dos Outros Jogadores</h4>";
     myCardsTitle.textContent = myCards && myCards.length > 0 ? "Suas Cartas" : "Você não possui cartas.";
-    imagesContainer.appendChild(myCardsTitle);
+    cardsContainer.appendChild(myCardsTitle);
 
     myCardsDiv.innerHTML = "";
     myCards.forEach((card) => {
       const img = document.createElement("img");
       img.src = `assets/game/cards/${card.name.toLowerCase()}.png`;
       img.alt = card.name;
-      img.className = "displayed-image tilt-image";
+      img.className = "displayed-cards tilt-image";
       myCardsDiv.appendChild(img);
     });
-    imagesContainer.appendChild(myCardsDiv);
+    cardsContainer.appendChild(myCardsDiv);
 
     // Exibir a quantidade de cartas dos outros jogadores
     otherPlayersCardsCountDiv.innerHTML = "<h4>Quantidade de Cartas dos Outros Jogadores</h4>";
@@ -227,14 +231,14 @@ socket.on("connect", () => {
 
 
     otherPlayersCardsCountDiv.appendChild(playersCardsCountList);
-    imagesContainer.appendChild(otherPlayersCardsCountDiv);
+    cardsContainer.appendChild(otherPlayersCardsCountDiv);
 
-    imagesContainer.classList.add("show");
+    cardsContainer.classList.add("show");
     overlay.classList.add("show");
 
     window.addEventListener("click", (event) => {
-      if (event.target === overlay || event.target === imagesContainer || event.target === closeButtonCards) {
-        imagesContainer.classList.remove("show");
+      if (event.target === overlay || event.target === cardsContainer || event.target === closeButtonCards) {
+        cardsContainer.classList.remove("show");
         overlay.classList.remove("show");
       }
     });
@@ -469,8 +473,16 @@ socket.on("connect", () => {
       return;
     }
 
-    if (player.name === "JOGO" || player.name === "JOGO (secreto)") {
-      renderer.renderReceivedMessage(player, message);
+    if (player.name === "JOGO") {
+      // Verifica se é uma mensagem de entrada/saída
+      if (message.includes("entrou") || message.includes("saiu")) {
+        const messageEl = document.createElement("li");
+        messageEl.classList.add("received-from-game", "event");
+        messageEl.innerHTML = `<em>${message}</em>`;
+        messagesElement.prepend(messageEl);
+      } else {
+        renderer.renderReceivedMessage(player, message);
+      }
     } else {
       const colorClass = getPlayerColor(player.name);
       const messageEl = document.createElement("li");
