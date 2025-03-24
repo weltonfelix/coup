@@ -499,7 +499,7 @@ socket.on("connect", () => {
     if (message.includes("Renda")) {
       console.log("renda");
       renderer.showCoinAnimation(1);
-    } else if (message.includes("Ajuda Extra")) {
+    } else if (message.includes("Ajuda Externa")) {
       renderer.showCoinAnimation(2);
     } else if (message.includes("Imposto")) {
       renderer.showCoinAnimation(3);
