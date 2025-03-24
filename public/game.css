@@ -21,6 +21,21 @@ input#input {
   font-size: 1.25rem;
   border-radius: 0.5rem;
   padding: 0.2rem;
+  border: 2px solid #B51E79;
+  outline: none;
+}
+
+#submit-button {
+  background-color: #F1F1F1;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#submit-button i {
+  color: #B51E79;
+  font-size: 18px;
 }
 
 #messages {
@@ -44,7 +59,7 @@ input#input {
 }
 
 #messages li.sent {
-  background-color: #a5d3c9;
+  background-color: #BAD7DC;
   margin-left: auto;
   padding-right: 1.7rem;
   border-bottom-right-radius: 0;
@@ -56,7 +71,7 @@ input#input {
   top: 50%;
   right: 0.5rem;
   font-size: 1rem;
-  color: #0a0441;
+  color: #F1F1F1;
   transform: translateY(-50%);
 }
 
@@ -69,7 +84,7 @@ input#input {
   width: 1rem;
   height: 1rem;
   border: 2px solid #ccc;
-  border-top-color: #0a0441; /* Blue accent */
+  border-top-color: #B51E79; /* Blue accent */
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   transform: translateY(-50%);
@@ -85,14 +100,14 @@ input#input {
 }
 
 #messages li.received {
-  background-color: #b1b4d1;
+  background-color: #F1F1F1;
   margin-right: 5rem;
   border-bottom-left-radius: 0;
 }
 
 #messages li.received-from-game {
-  background-color: #a4a6bb;
-  color: #1c1d1f;
+  background-color: #79222F;
+  color: #FFFFFF;
   margin: 0 auto;
   text-align: center;
   max-width: 600px;
@@ -283,7 +298,9 @@ input#input {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  box-shadow: 0px 5.03px 11.17px 0px #8930841a, 0px 20.1px 20.1px 0px #89308417,
+  0px 45.79px 27.36px 0px #8930840d, 0px 80.97px 32.39px 0px #89308403,
+  0px 126.76px 35.74px 0px #89308400;
   padding: 0;
 }
 
@@ -428,43 +445,43 @@ input#input {
 }
 
 .player-name-color-1 {
-  color: #ff9500;
+  color: #79222F;
 }
 
 .player-name-color-2 {
-  color: #34c759;
+  color: #B51E79;
 }
 
 .player-name-color-3 {
-  color: #5ac8fa;
+  color: #398E9C;
 }
 
 .player-name-color-4 {
-  color: #ff3b30;
+  color: #8F2E82;
 }
 
 .player-name-color-5 {
-  color: #5856d6;
+  color: #254B56;
 }
 
 .player-name-color-6 {
-  color: #ffcc00;
+  color: #C23F37;
 }
 
 .player-name-color-7 {
-  color: #007aff;
+  color: #C14E06;
 }
 
 .player-name-color-8 {
-  color: #ff2d55;
+  color: #C302D5;
 }
 
 .player-name-color-9 {
-  color: #ff9f0a;
+  color: #755D4B;
 }
 
 .player-name-color-10 {
-  color: #30d158;
+  color: #34A96F;
 }
 
 div#inTurnActions {
@@ -482,10 +499,10 @@ div#inTurnActions button {
   padding: 0.5rem 1rem;
   width: 100%;
   background-color: transparent;
-  color: #564bb8;
+  color: #B51E79;
   font-size: 1rem;
   border-radius: 0.5rem;
-  border: 1px solid #564bb8;
+  border: 1px solid #B51E79;
   cursor: pointer;
 }
 
