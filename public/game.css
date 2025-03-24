@@ -256,22 +256,22 @@ input#input {
   align-items: center;
 }
 
-.bottom-button-1 {
+.cards-button {
   position: absolute;
   top: 3rem;
   right: 0rem;
   z-index: 100;
 }
 
-.bottom-button-2 {
+.coins-button {
   position: absolute;
   top: 6rem;
   right: 0rem;
   z-index: 100;
 }
 
-.bottom-button-cards,
-.bottom-button-coins {
+.button-cards,
+.button-coins {
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
@@ -285,8 +285,8 @@ input#input {
   padding: 0;
 }
 
-.bottom-button-cards:hover,
-.bottom-button-coins:hover {
+.button-cards:hover,
+.button-coins:hover {
   background-color: #f5f5f5;
 }
 
@@ -343,10 +343,11 @@ input#input {
   height: auto;
 }
 
-.close-images-button {
+.close-button-cards,
+.close-button-coins {
   position: absolute;
-  top: -1.5rem;
-  right: -1.5rem;
+  top: -2.5rem;
+  right: -2.5rem;
   background-color: #fff;
   border: 1px solid #ccc;
   border-radius: 50%;
@@ -361,7 +362,8 @@ input#input {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
-.close-images-button:hover {
+.close-button-cards:hover,
+.close-button-coins:hover {
   background-color: #f5f5f5;
   color: #333;
 }

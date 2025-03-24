@@ -15,10 +15,10 @@ const popupContainer = document.getElementById("popup-container");
 const closePopup = document.getElementById("close-popup");
 
 const cardsButton = document.querySelector(
-  ".bottom-button-1 .bottom-button-cards"
+  ".cards-button .button-cards"
 );
 const coinsButton = document.querySelector(
-  ".bottom-button-2 .bottom-button-coins"
+  ".coins-button .button-coins"
 );
 
 const overlay = document.getElementById("overlay");
@@ -42,6 +42,14 @@ if (!playerName) {
     "Você precisa de um nome para jogar. Recarregue a página e tente novamente."
   );
   throw new Error("No name provided");
+}
+
+if (playerName.length > 12) {
+  renderer.renderReceivedMessage(
+    { name: "JOGO" },
+    "O nome do jogador não pode ter mais de 12 caracteres. Recarregue a página e tente novamente."
+  );
+  throw new Error("Name too long");
 }
 
 const socket = io({
@@ -174,6 +182,7 @@ socket.on("connect", () => {
     const myCardsTitle = document.getElementById("my-cards-title");
     const myCardsDiv = document.getElementById("my-cards");
     const otherPlayersCardsCountDiv = document.getElementById("other-players-cards-count");
+    const closeButtonCards = document.getElementById("close-button-cards");
 
     myCardsDiv.innerHTML = "";
     otherPlayersCardsCountDiv.innerHTML = "<h4>Quantidade de Cartas dos Outros Jogadores</h4>";
@@ -224,7 +233,7 @@ socket.on("connect", () => {
     overlay.classList.add("show");
 
     window.addEventListener("click", (event) => {
-      if (event.target === overlay || event.target === imagesContainer) {
+      if (event.target === overlay || event.target === imagesContainer || event.target === closeButtonCards) {
         imagesContainer.classList.remove("show");
         overlay.classList.remove("show");
       }
@@ -237,10 +246,11 @@ socket.on("connect", () => {
   coinsButton.addEventListener("click", () => {
     const players = game.state.players;
     const coinsContainer = document.getElementById("coins-container");
+    const closeButtonCoins = document.getElementById("close-button-coins");
     showPlayerCoins(players);
 
     window.addEventListener("click", (event) => {
-      if (event.target === overlay || event.target === coinsContainer) {
+      if (event.target === overlay || event.target === coinsContainer || event.target === closeButtonCoins) {
         coinsContainer.classList.remove("show");
         overlay.classList.remove("show");
       }
