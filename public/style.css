@@ -9,9 +9,6 @@ body {
   font-family: 'Roboto', 'Ubuntu', 'Arial', sans-serif;
 }
 
-/* (Mantendo todo o CSS existente) */
-
-/* ===== ESTILO DO MODAL DE REGRAS ===== */
 .modal {
   display: none;
   position: fixed;
@@ -19,7 +16,7 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Fundo escuro semi-transparente */
+  background-color: rgba(0, 0, 0, 0.7);
   z-index: 1000;
   justify-content: center;
   align-items: center;
@@ -34,9 +31,8 @@ body {
   max-width: 600px;
   max-height: 80vh;
   overflow-y: auto;
-  border: 3px solid #b51e79; /* Borda rosa do tema */
-  box-shadow: 0 0 20px rgba(181, 30, 121, 0.5);
-  color: #333; /* Texto escuro */
+  border: 3px solid #b51e79;
+  color: #333; 
   position: relative;
 }
 
@@ -45,14 +41,14 @@ body {
   top: 15px;
   right: 15px;
   font-size: 2rem;
-  color: #b51e79; /* Cor do tema */
+  color: #b51e79;
   cursor: pointer;
   transition: transform 0.3s;
 }
 
 .close-button:hover {
   transform: scale(1.2);
-  color: #8B0000; /* Vermelho escuro no hover */
+  color: #8B0000; 
 }
 
 .rules-text {
@@ -63,21 +59,13 @@ body {
 }
 
 .rules-text h3 {
-  color: #398e9c; /* Azul do gradiente do botão */
+  color: #398e9c; 
   margin-top: 1.5rem;
-  border-bottom: 2px solid #b51e79; /* Detalhe rosa */
+  border-bottom: 2px solid #b51e79; 
   padding-bottom: 5px;
 }
 
 .rules-text p {
   margin-bottom: 0.8rem;
-  color: #555; /* Cinza escuro para melhor legibilidade */
-}
-
-/* Responsividade */
-@media (max-width: 768px) {
-  .modal-content {
-    padding: 1.5rem;
-    width: 95%;
-  }
+  color: #555;
 }

@@ -192,7 +192,7 @@ input#input {
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
+  background-color: rgba(0, 0, 0, 0.7); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -200,6 +200,7 @@ input#input {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
+  font-family: "Irish Grover", cursive;
 }
 
 .popup-container.show {
@@ -212,11 +213,13 @@ input#input {
   max-width: 90%;
   max-height: 80vh;
   background-color: #fff;
-  border-radius: 0.5rem;
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  border-radius: 1rem; 
+  border: 3px solid #b51e79; 
   overflow: auto;
   transform: translateY(-20px);
   transition: transform 0.3s ease;
+  color: #333; 
+  position: relative; 
 }
 
 .popup-container.show .popup-content {
@@ -227,41 +230,52 @@ input#input {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.75rem 1rem;
-  background-color: #f5f5f5;
-  border-bottom: 1px solid #eee;
+  padding: 1rem 1.5rem;
+  border-bottom: 2px solid #b51e79; 
   position: sticky;
   top: 0;
+  background: white; 
 }
 
 .popup-header h3 {
+  font-family: "Irish Grover", cursive; 
+  font-size: 1.8rem;
+  color: #b51e79; 
   margin: 0;
-  font-size: 1.25rem;
-  font-weight: 600;
+  font-weight: normal; 
+  text-align: center;
+  width: 100%; 
+  letter-spacing: 0.5px; 
 }
 
 .close-popup {
   background: none;
   border: none;
-  font-size: 1.5rem;
+  font-size: 2rem; 
   line-height: 1;
   cursor: pointer;
-  color: #666;
+  color: #b51e79;
+  transition: transform 0.3s;
+  padding: 0 0.5rem;
 }
 
 .close-popup:hover {
-  color: #333;
+  transform: scale(1.2); 
+  color: #8B0000; 
 }
 
 .popup-body {
   padding: 1.5rem;
+  line-height: 1.6;
 }
 
 .popup-body h4 {
-  margin-top: 1rem;
-  margin-bottom: 0.5rem;
-  font-size: 1.1rem;
-  color: #333;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  font-size: 1.2rem;
+  color: #398e9c;
+  border-bottom: 1px dashed #b51e79; 
+  padding-bottom: 0.3rem;
 }
 
 .popup-body h4:first-child {
@@ -269,8 +283,38 @@ input#input {
 }
 
 .popup-body p {
-  margin-bottom: 0.5rem;
-  line-height: 1.5;
+  margin-bottom: 0.8rem; 
+  color: #555; 
+}
+
+.popup-body strong {
+  color: #b51e79; 
+}
+
+.popup-content::-webkit-scrollbar {
+  width: 12px;
+  background: transparent; /* Fundo transparente */
+}
+
+.popup-content::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+  border-radius: 0 0.5rem 0.5rem 0; 
+}
+
+.popup-content::-webkit-scrollbar-thumb {
+  background: #b51e79; 
+  border-radius: 0.5rem;
+  border: 2px solid #f1f1f1; 
+}
+
+.popup-content::-webkit-scrollbar-thumb:hover {
+  background: #8B0000; 
+}
+
+/* Para Firefox */
+.popup-content {
+  scrollbar-width: thin;
+  scrollbar-color: #b51e79 #f1f1f1;
 }
 
 .cards-button {
@@ -298,9 +342,7 @@ input#input {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0px 5.03px 11.17px 0px #8930841a, 0px 20.1px 20.1px 0px #89308417,
-  0px 45.79px 27.36px 0px #8930840d, 0px 80.97px 32.39px 0px #89308403,
-  0px 126.76px 35.74px 0px #89308400;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   padding: 0;
 }
 
