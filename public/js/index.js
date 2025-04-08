@@ -330,6 +330,20 @@ socket.on("connect", () => {
         1
       );
     },
+    "/dropdesconfio": (cardName) => {
+      if (
+        !myCards.find(
+          (card) => card.name.toLowerCase() === cardName[0].toLowerCase()
+        )
+      ) {
+        return renderSecretMessage("Você não tem essa carta.");
+      }
+      socket.emit("gameAction", { action: "dropCardChallenge", param: cardName[0] });
+      myCards.splice(
+        myCards.findIndex((card) => card.name === cardName[0]),
+        1
+      );
+    },
     "/trocar": (cardName) => {
       const cardNameString = cardName[0];
 

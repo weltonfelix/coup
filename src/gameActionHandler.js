@@ -28,6 +28,10 @@ export class GameActionHandler {
     return this.game.dropCardCoup(player.id, cardName);
   }
 
+  dropCardChallenge(player, cardName) {
+    return this.game.dropCardChallenge(player.id, cardName);
+  }
+
   exchangeCard(player, cardName) {
     return this.game.exchangeCard(player.id, cardName);
   }

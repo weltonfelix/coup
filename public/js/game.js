@@ -317,6 +317,34 @@ export class Game {
   }
 
   /**
+   * Jogador perde uma carta por golpe.
+   * @param string playerId ID do jogador que está perdendo a carta
+   * @param string cardName Nome da carta que será removida
+   * @returns {Card|null} Retorna a carta removida, ou null se a carta
+   * não foi encontrada
+   */
+  dropCardChallenge(playerId, cardName) {
+    if (!this.#isAlive(playerId)) return null;
+    const player = this.state.players[playerId];
+    const index = this.playerCards[playerId].findIndex(
+      (c) => c.name.toLowerCase() === cardName.toLowerCase()
+    );
+
+    if (index !== -1) {
+      return {
+        card: this.playerCards[playerId].splice(index, 1)[0],
+        message: `${player.name} mentiu e perdeu um ${cardName}`,
+        success: true,
+      };
+    } else {
+      return {
+        message: `Você não tem essa carta`,
+        success: false,
+      };
+    }
+  }
+
+  /**
    * Jogador tenta roubar moedas.
    * @param string playerId ID do jogador que está roubando
    * @param string playerId ID do jogador que está sendo roubado

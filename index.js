@@ -217,6 +217,16 @@ io.on("connection", (socket) => {
         }
         break;
 
+      case "dropCardChallenge":
+        resultObject = gameActionHandler.dropCardChallenge(player, param);
+        if (!resultObject) {
+          return m.sendMessageToAll({
+            player: { name: "JOGO" },
+            message: `Erro. Tente novamente`,
+          });
+        }
+        break;
+
       case "drawCoins":
         resultObject = gameActionHandler.drawCoins(player, param);
         break;
