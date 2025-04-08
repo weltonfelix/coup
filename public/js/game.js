@@ -351,19 +351,19 @@ export class Game {
    * @returns {Card|null} Retorna  a mensagem de roubo
    */
   steal(playerId, targetPlayer) {
-    if (!this.#isAlive(this.getPlayerByName(targetPlayer)?.id)) {
+    if (!this.#isAlive(this.getPlayerByName(targetPlayer[0])?.id)) {
       return {
         message: `Insira um jogador alvo válido`,
       };
     } else {
       const amountStealed = Math.min(
-        this.state.players[this.getPlayerByName(targetPlayer).id].coins,
+        this.state.players[this.getPlayerByName(targetPlayer[0]).id].coins,
         2
       );
       const player = this.state.players[playerId];
 
       return {
-        message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer}`,
+        message: `${player.name} quer roubar ${amountStealed} moedas de ${targetPlayer[0]}`,
       };
     }
   }
