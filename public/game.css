@@ -156,6 +156,15 @@ input#input {
   display: none;
 }
 
+#liar-animation {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  display: none;
+}
+
 
 .popup-button {
   position: absolute;

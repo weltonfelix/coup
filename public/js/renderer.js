@@ -3,6 +3,7 @@ export class Renderer {
     this.containerEl = containerEl;
     this.coinContainer = document.querySelector("#coin-container");
     this.murderAnimation = document.querySelector("#murder-animation");
+    this.liarAnimation = document.querySelector("#liar-animation")
   }
 
   renderSentMessage(message) {
@@ -71,6 +72,15 @@ export class Renderer {
     this.murderAnimation.style.display = "block";
     setTimeout(() => {
       this.murderAnimation.style.display = "none";
+    }, 2000);
+  }
+
+  showLiarAnimation() {
+    if (!this.liarAnimation) return;
+
+    this.liarAnimation.style.display = "block";
+    setTimeout(() => {
+      this.liarAnimation.style.display = "none";
     }, 2000);
   }
 }

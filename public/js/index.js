@@ -519,6 +519,8 @@ socket.on("connect", () => {
       renderer.showCoinAnimation(3);
     } else if (message.includes("assassinado")) {
       renderer.showMurderAnimation();
+    } else if (message.includes("mentiu")) {
+      renderer.showLiarAnimation();
     }
   });
 
