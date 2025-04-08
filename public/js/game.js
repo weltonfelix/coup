@@ -483,15 +483,20 @@ export class Game {
    * @private
    */
   drawCoins(playerId, amount) {
-    this.state.players[playerId].coins += amount;
+    if (amount === 20) {
+      this.state.players[playerId].coins += 2;  
+    } else {
+      this.state.players[playerId].coins += amount; 
+    }
+    
     if (amount === 1) {
       return {
         message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Renda`,
         success: true,
       };
-    } else if (amount === 2) {
+    } else if (amount === 20) {
       return {
-        message: `${this.state.players[playerId].name} pegou ${amount} moedas como <strong>Ajuda Externa`,
+        message: `${this.state.players[playerId].name} pegou 2 moedas como <strong>Ajuda Externa`,
         success: true,
       };
     } else if (amount === 3) {

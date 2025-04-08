@@ -288,7 +288,7 @@ socket.on("connect", () => {
       socket.emit("gameAction", { action: "drawCoins", param: 1 });
     },
     "/ajudaexterna": () => {
-      socket.emit("gameAction", { action: "drawCoins", param: 2 });
+      socket.emit("gameAction", { action: "drawCoins", param: 20 });
     },
     "/duque": () => {
       socket.emit("gameAction", { action: "drawCoins", param: 3 });
