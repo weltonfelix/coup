@@ -61,7 +61,7 @@ input#input {
 #messages li.sent {
   background-color: #BAD7DC;
   margin-left: auto;
-  padding-right: 1.7rem;
+  padding-right: 2.0rem;
   border-bottom-right-radius: 0;
 }
 
