@@ -376,6 +376,7 @@ input#input {
   color: #ffffff;
   white-space: nowrap;
   z-index: 101;
+  
 }
 
 .cards-container {
@@ -457,8 +458,8 @@ input#input {
 
 .coins-title {
   font-size: 1.5rem;
-  font-weight: bold;
-  color: #333;
+  color: #b51e79;
+  font-family: "Irish Grover", cursive;   
 }
 
 .coins-list {
@@ -585,7 +586,10 @@ div#playersOrder.show {
 .other-players-cards-count h4 {
   margin-bottom: 0.5rem;
   font-size: 1.1rem;
-  color: #333;
+  color: #b51e79;
+  font-weight: 500;
+  font-family: "Irish Grover", cursive;   
+
 }
 
 .other-players-cards-count .player-cards-count {
